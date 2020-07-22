@@ -13,6 +13,7 @@ class CovarianceMatrix(object):
         ----------
         cosmology : Cosmology
         non_linear_power : NonLinearPower
+        kbins : float, array_like
         bias_params : BiasParams
         V_eff : float
 
@@ -42,7 +43,6 @@ class CovarianceMatrix(object):
         np.fill_diagonal(matrix, values)
 
         return matrix
-
 
     def compute_02(self):
         matrix = np.zeros((len(self.__kbins), len(self.__kbins)))

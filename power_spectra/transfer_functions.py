@@ -7,7 +7,7 @@ Jul 2020
 
 import numpy
 
-class EisensteinHu(object):
+class EisensteinHu():
     """
     The linear matter transfer function using the Eisenstein & Hu (1998)
     fitting formula with BAO wiggles.
@@ -15,8 +15,6 @@ class EisensteinHu(object):
     ----------
     cosmo : :class:`Cosmology`
         the cosmology instance
-    redshift : float
-        the redshift of the power spectrum
     References
     ----------
     Eisenstein & Hu, "Baryonic Features in the Matter Transfer Function", 1998
@@ -71,6 +69,8 @@ class EisensteinHu(object):
         :func:`Cosmology.scale_independent_growth_factor` function.
         Parameters
         ---------
+        redshift : float
+            redshift at which to evaluate transfer function
         k : float, array_like
             the wavenumbers in units of :math:`h \mathrm{Mpc}^{-1}`
         Returns
@@ -119,8 +119,6 @@ class NoWiggleEisensteinHu(object):
     ----------
     cosmo : :class:`Cosmology`
         the cosmology instance
-    redshift : float
-        the redshift of the power spectrum
     References
     ----------
     Eisenstein & Hu, "Baryonic Features in the Matter Transfer Function", 1998
@@ -150,6 +148,8 @@ class NoWiggleEisensteinHu(object):
         :func:`~Cosmology.scale_independent_growth_factor` function.
         Parameters
         ---------
+        redshift : float
+            redshift at which to evaluate transfer function
         k : float, array_like
             the wavenumbers in units of :math:`h \mathrm{Mpc}^{-1}`
         Returns

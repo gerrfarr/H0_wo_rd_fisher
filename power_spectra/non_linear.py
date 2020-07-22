@@ -1,6 +1,9 @@
 import tempfile
 import numpy as np
+
 import _warnings as warnings
+import numpy as np
+
 from .linear_power import LinearPower
 from .cosmology import Cosmology
 from ..custom_exceptions import ClassComputationError, OrderOfOperationsError, ParameterValueError, TemporaryFileClosedWarning
@@ -21,12 +24,14 @@ class BiasParams(object):
 class NonLinearPower(object):
     def __init__(self, cosmo, linPower, redshift, k_vals_h_invMpc=None):
         """
-        :type cosmo: Cosmology
-        :type linPower: LinearPower
-        :type redshift: float
-        :type bias_params: BiasParams
-        """
 
+        Parameters
+        ----------
+        cosmo : Cosmology
+        linPower : LinearPower
+        redshift : float
+        k_vals_h_invMpc : numpy.ndarray
+        """
         self.__cosmo = cosmo
         self.__linPower = linPower
         self.__redshift = redshift
@@ -86,10 +91,20 @@ class NonLinearPower(object):
 
     def get_non_linear(self, ell, kbins, bias_params):
         """
-        :type bias_params: BiasParams
-        :type kbins: ndarray
-        :type ell: int
+
+        Parameters
+        ----------
+        ell : int
+            Select Mono- or Quadrupole
+        bias_params : BiasParams
+        kbins : array_like
+
+        Returns
+        ----------
+        array_like
+            Biased non-linear power spectra (Monopole and Quandrupole depending on value of `ell`)
         """
+
         if not self.__computed:
             raise OrderOfOperationsError("Non-linear power spectra can not be obtained. They have not been computed yet.")
         else:

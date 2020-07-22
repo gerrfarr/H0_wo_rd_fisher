@@ -5,9 +5,20 @@ heavily inspired by nbodykit
 Jul 2020
 """
 from .transfer_functions import *
+from .cosmology import Cosmology
 
 class LinearPower(object):
     def __init__(self, cosmo, no_wiggle=False):
+        """
+
+        Parameters
+        ----------
+        cosmo : Cosmology
+            Instance of cosmology
+        no_wiggle : bool, optional
+            Whether to use or not use :class:`NoWiggleEisensteinHu` or :class:`EisensteinHu` (default)
+
+        """
         self.cosmo=cosmo
         if no_wiggle:
             self._transfer = NoWiggleEisensteinHu(self.cosmo)
@@ -18,6 +29,19 @@ class LinearPower(object):
         self._norm=(cosmo.sigma8 / self.sigma_r(8., 0.0))**2
 
     def __call__(self, k, z):
+        r"""
+        Parameters
+        ----------
+        k : array_like
+            k values in :math:`\mathrm{Mpc/h}` to compute power spectrum at
+        z : float
+            redshift
+
+        Returns
+        __________
+        array_like
+            linear power spectrum at redshift `z` and wavenumber(s) `k`
+        """
         Pk = k ** self.cosmo.n_s * self._transfer(k, z) ** 2
         return self._norm * Pk
 
@@ -42,8 +66,9 @@ class LinearPower(object):
         Parameters
         ----------
         r : float, array_like
-            the scale to compute the mass fluctation over, in units of
-            :math:`h^{-1} Mpc`
+            the scale to compute the mass fluctation over, in units of :math:`h^{-1} Mpc`
+        z: float
+            the redshift to compute the mass fluctuation at
         kmin : float, optional
             the lower bound for the integral, in units of :math:`\mathrm{Mpc/h}`
         kmax : float, optional
