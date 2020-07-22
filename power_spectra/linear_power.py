@@ -5,7 +5,6 @@ heavily inspired by nbodykit
 Jul 2020
 """
 from .transfer_functions import *
-A_s_PLANCK=2.0989e-9
 
 class LinearPower(object):
     def __init__(self, cosmo, no_wiggle=False):
