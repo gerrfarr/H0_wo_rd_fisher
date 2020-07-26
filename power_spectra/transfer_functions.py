@@ -38,10 +38,10 @@ class EisensteinHu():
         self.z_drag    = 1291 * self.Omh2 ** 0.251 / (1. + 0.659 * self.Omh2 ** 0.828) * \
                            (1. + self.z_drag_b1 * self.Obh2 ** self.z_drag_b2)
 
-        self.r_drag = cosmo.sound_horizon_scaling * 31.5 * self.Obh2 * self.theta_cmb ** -4 * (1000. / (1+self.z_drag))
+        self.r_drag = 31.5 * self.Obh2 * self.theta_cmb ** -4 * (1000. / (1+self.z_drag))
         self.r_eq   = 31.5 * self.Obh2 * self.theta_cmb ** -4 * (1000. / self.z_eq)
 
-        self.sound_horizon = (2. / (3. * self.k_eq) * numpy.sqrt(6. / self.r_eq) * numpy.log((numpy.sqrt(1 + self.r_drag) + numpy.sqrt(self.r_drag + self.r_eq)) / (1 + numpy.sqrt(self.r_eq))))
+        self.sound_horizon = cosmo.sound_horizon_scaling * (2. / (3. * self.k_eq) * numpy.sqrt(6. / self.r_eq) * numpy.log((numpy.sqrt(1 + self.r_drag) + numpy.sqrt(self.r_drag + self.r_eq)) / (1 + numpy.sqrt(self.r_eq))))
         self.k_silk = 1.6 * self.Obh2 ** 0.52 * self.Omh2 ** 0.73 * (1 + (10.4*self.Omh2) ** -0.95)
 
         # alpha_c
