@@ -1,6 +1,6 @@
 import tempfile
-import numpy as np
-
+from copy import copy
+from classy import Class
 import _warnings as warnings
 import numpy as np
 
@@ -19,6 +19,68 @@ class BiasParams(object):
         self.b4 = b4
         self.Pshot = Pshot
         self.bGamma3 = bGamma3
+
+    def clone(self):
+        return BiasParams(b1=self.b1, b2=self.b2, bG2=self.bG2, css0=self.css0, css2=self.css2, b4=self.b4, Pshot=self.Pshot, bGamma3=self.bGamma3)
+
+class ParameterPackage(object):
+    cosmo_param_names = ['h', 'T0_cmb', 'n_s', 'A_s', 'sound_horizon_scaling', 'N_eff', 'norm', 'omega_b', 'omega_cdm']
+    bias_param_names = ['b1', 'b2', 'bG2', 'css0', 'css2', 'b4', 'Pshot', 'bGamma3']
+    def __init__(self, cosmo, bias_params):
+        """
+        Packages all parameters for the cosmology and BiasParams object.
+
+        Parameters
+        ----------
+        cosmo : Cosmology
+        bias_params : BiasParams
+        """
+        self.__cosmo = cosmo
+        self.__bias_params = bias_params
+
+    def __setattr__(self, key, value):
+        """
+        Overwritten setattr
+        Parameters
+        ----------
+        key
+        value
+
+        Returns
+        -------
+
+        """
+        if key in ['_ParameterPackage__cosmo', '_ParameterPackage__bias_params']:
+            super().__setattr__(key, value)
+        elif key in self.cosmo_param_names:
+            setattr(self.__cosmo, key, value)
+        elif key in self.bias_param_names:
+            setattr(self.__bias_params, key, value)
+        else:
+            raise AttributeError("Set:Neither Cosmology nor BiasParams have an attribute named {}.".format(key))
+
+    def __getattr__(self, key):
+        if key in self.cosmo_param_names or key in ['class_params', 'get_class', 'compute', 'computed', 'Omega0_m', 'scale_independent_growth_factor', 'sigma8', 'Omega0_b', 'Omega0_cdm']:
+            return getattr(self.__cosmo, key)
+        elif key in self.bias_param_names:
+            return getattr(self.__bias_params, key)
+        else:
+            raise AttributeError("Get:Neither Cosmology nor BiasParams have an attribute named {}.".format(key))
+
+    def clone(self):
+        cosmo_clone=self.__cosmo.clone()
+        bias_params_clone=self.__bias_params.clone()
+
+        return ParameterPackage(cosmo_clone, bias_params_clone)
+
+    @property
+    def bias_params(self):
+        return self.__bias_params
+
+    @property
+    def cosmo(self):
+        return self.__cosmo
+
 
 
 class NonLinearPower(object):
@@ -46,8 +108,8 @@ class NonLinearPower(object):
 
         np.savetxt(self.get_power_spectrum_path(), np.vstack([k_vals_h_invMpc * cosmo.h, pk_lin_vals / cosmo.h ** 3]).T, delimiter='\t')
 
-        self.__class_params = cosmo.class_params()
-        self.__class = cosmo.get_class()
+        self.__class = Class()
+        self.__class.set(cosmo.class_params)
 
         class_non_linear_params = {'z_pk': redshift,
                                    'non linear': ' PT ',
@@ -66,14 +128,17 @@ class NonLinearPower(object):
         return self.__computed
 
     def compute(self):
-        try:
-            self.__class.compute()
-        except Exception as ex:
-            print("Got the following error while computing non-linear power specta:")
-            print(str(ex))
-            raise ClassComputationError("Non-linear power spectra computation failed.")
-        self.__computed = True
-        self.__temporary_power_spectrum_file.close()
+        if not self.__computed:
+            try:
+                self.__class.compute()
+            except Exception as ex:
+                print("Got the following error while computing non-linear power spectra:")
+                print(str(ex))
+                raise ClassComputationError("Non-linear power spectra computation failed.")
+            self.__computed = True
+            self.__temporary_power_spectrum_file.close()
+        else:
+            print("Non-linear power spectra already available.")
 
     def get_power_spectrum_path(self):
         if not self.__temporary_power_spectrum_file.closed:

@@ -16,7 +16,7 @@ class LinearPower(object):
         cosmo : Cosmology
             Instance of cosmology
         no_wiggle : bool, optional
-            Whether to use or not use :class:`NoWiggleEisensteinHu` or :class:`EisensteinHu` (default)
+            Whether to use :class:`NoWiggleEisensteinHu` or :class:`EisensteinHu` (default)
 
         """
         self.cosmo=cosmo
