@@ -10,7 +10,7 @@ from ..custom_exceptions import ClassComputationError, OrderOfOperationsError, P
 
 
 class BiasParams(object):
-    def __init__(self, b1=2.0, b2=0.0, bG2=0.0, css0=0.0, css2=0.0, b4=500.0, Pshot=0.0, bGamma3=0.0):
+    def __init__(self, b1=2.0, b2=0.0, bG2=0.0, css0=0.0, css2=0.0, b4=500.0, Pshot=3500.0, bGamma3=0.0):
         self.b1 = b1
         self.b2 = b2
         self.bG2 = bG2
@@ -67,8 +67,8 @@ class ParameterPackage(object):
         else:
             raise AttributeError("Get:Neither Cosmology nor BiasParams have an attribute named {}.".format(key))
 
-    def clone(self):
-        cosmo_clone=self.__cosmo.clone()
+    def clone(self, pre_computed=False):
+        cosmo_clone=self.__cosmo.clone(pre_computed)
         bias_params_clone=self.__bias_params.clone()
 
         return ParameterPackage(cosmo_clone, bias_params_clone)
@@ -80,6 +80,14 @@ class ParameterPackage(object):
     @property
     def cosmo(self):
         return self.__cosmo
+
+    @staticmethod
+    def in_cosmo(param_name):
+        return param_name in ParameterPackage.cosmo_param_names
+
+    @staticmethod
+    def in_bias_params(param_name):
+        return param_name in ParameterPackage.bias_param_names
 
 
 
@@ -106,7 +114,7 @@ class NonLinearPower(object):
 
         self.__temporary_power_spectrum_file = tempfile.NamedTemporaryFile()
 
-        np.savetxt(self.get_power_spectrum_path(), np.vstack([k_vals_h_invMpc * cosmo.h, pk_lin_vals / cosmo.h ** 3]).T, delimiter='\t')
+        np.savetxt(self.get_power_spectrum_path(), np.vstack([k_vals_h_invMpc * cosmo.h, pk_lin_vals / cosmo.h ** 3 / cosmo.norm]).T, delimiter='\t')
 
         self.__class = Class()
         self.__class.set(cosmo.class_params)
@@ -116,12 +124,15 @@ class NonLinearPower(object):
                                    'IR resummation': ' Yes ',
                                    'Bias tracers': ' Yes ',
                                    'RSD': ' Yes ',
-                                   'AP': 'Yes',
+                                   'AP': 'No',
                                    'FFTLog mode': 'FAST',
                                    'Input Pk': self.get_power_spectrum_path(),
                                    }
 
         self.__class.set(class_non_linear_params)
+
+    def get_non_linear_class(self):
+        return self.__class
 
     @property
     def computed(self):
@@ -173,7 +184,7 @@ class NonLinearPower(object):
         if not self.__computed:
             raise OrderOfOperationsError("Non-linear power spectra can not be obtained. They have not been computed yet.")
         else:
-            if ell == 0:
+            if ell == 2:
                 fz = self.__class.scale_independent_growth_factor_f(self.__redshift)
                 pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins))
 
@@ -189,7 +200,7 @@ class NonLinearPower(object):
                         + (2. * bias_params.bG2 + 0.8 * bias_params.bGamma3) * self.__cosmo.norm ** 3. * pk_mult[9]) * self.__cosmo.h ** 3. \
                        + fz ** 2. * bias_params.b4 * kbins ** 2. * ((self.__cosmo.norm ** 2. * fz ** 2. * 70. + 165. * fz * bias_params.b1 * self.__cosmo.norm + 99. * bias_params.b1 ** 2.) * 4. / 693.) * (35. / 8.) * pk_mult[13] * self.__cosmo.h
 
-            elif ell == 2:
+            elif ell == 0:
                 fz = self.__class.scale_independent_growth_factor_f(self.__redshift)
                 pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins))
                 return (self.__cosmo.norm ** 2. * pk_mult[15] \

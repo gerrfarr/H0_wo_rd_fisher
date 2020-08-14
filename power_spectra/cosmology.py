@@ -61,6 +61,9 @@ class Cosmology(object):
     def scale_independent_growth_factor(self, redshift):
         return self.__class.scale_independent_growth_factor(redshift)
 
+    def scale_independent_growth_factor_f(self, redshift):
+        return self.__class.scale_independent_growth_factor_f(redshift)
+
     @property
     def class_params(self):
         return {
@@ -70,8 +73,9 @@ class Cosmology(object):
             'h': self.h,
             'omega_b': self.omega_b,
             'omega_cdm': self.omega_cdm,
-            'N_ur': self.N_eff,
-            'output': 'mPk'
+            'output': 'mPk',
+            'N_ncdm':0,
+            'N_ur':self.N_eff
         }
 
     def get_class(self):
@@ -88,13 +92,19 @@ class Cosmology(object):
         self.__class.compute()
         self.__computed = True
 
-    def clone(self):
-        return Cosmology(
-            h=self.h,
-            T0_cmb=self.T0_cmb,
-            omega_b=self.omega_b,
-            omega_cdm=self.omega_cdm,
-            n_s=self.n_s,
-            A_s=self.A_s,
-            sound_horizon_scaling=self.sound_horizon_scaling,
-            N_eff=self.N_eff)
+    def clone(self, pre_computed=False):
+        if pre_computed and self.__computed:
+            return self
+        elif pre_computed and not self.__computed:
+            self.compute()
+            return self
+        else:
+            return Cosmology(
+                h=self.h,
+                T0_cmb=self.T0_cmb,
+                omega_b=self.omega_b,
+                omega_cdm=self.omega_cdm,
+                n_s=self.n_s,
+                A_s=self.A_s,
+                sound_horizon_scaling=self.sound_horizon_scaling,
+                N_eff=self.N_eff)

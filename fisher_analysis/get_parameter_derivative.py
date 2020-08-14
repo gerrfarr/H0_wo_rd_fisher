@@ -47,6 +47,7 @@ class ParamDerivatives(object):
             stencil = np.array((self.__param_vals - self.__fiducial_value) / self.__step_size, dtype=np.int)
 
         self.__coefficients = DifferentiationHelper.get_finite_difference_coefficients(stencil, 1)
+        self.__has_to_recompute = param_name in ParameterPackage.cosmo_param_names
 
         self.__cosmologies = None
         self.__evals = None
@@ -84,16 +85,20 @@ class ParamDerivatives(object):
         """
         cosmos = []
         for i in range(len(self.__param_vals)):
-            val = self.__param_vals[i]
-            if val == self.__fiducial_value:
-                cosmos.append(self.__fiducial)
-                if not self.__fiducial.computed:
-                    self.__fiducial.compute()
+            if self.__coefficients[i]!=0:
+                val = self.__param_vals[i]
+                if val == self.__fiducial_value:
+                    cosmos.append(self.__fiducial)
+                    if not self.__fiducial.computed and self.__has_to_recompute:
+                        self.__fiducial.compute()
+                else:
+                    new_cosmo = self.__fiducial.clone(pre_computed=not self.__has_to_recompute)
+                    setattr(new_cosmo, self.__param_name, val)
+                    if self.__has_to_recompute:
+                        new_cosmo.compute()
+                    cosmos.append(new_cosmo)
             else:
-                new_cosmo = self.__fiducial.clone()
-                setattr(new_cosmo, self.__param_name, val)
-                new_cosmo.compute()
-                cosmos.append(new_cosmo)
+                cosmos.append(None)
 
         return cosmos
 
@@ -107,9 +112,10 @@ class ParamDerivatives(object):
         """
         values = []
         for i in range(len(self.__cosmologies)):
-            cosmo = self.__cosmologies[i]
-            vals = self.__eval_function(cosmo, *self.__args, **self.__kwargs)
-            values.append(vals)
+            if self.__coefficients[i]!=0:
+                cosmo = self.__cosmologies[i]
+                vals = self.__eval_function(cosmo, *self.__args, **self.__kwargs)
+                values.append(vals)
 
         return values
 
@@ -122,7 +128,7 @@ class ParamDerivatives(object):
             ndarray of derivatives
         """
 
-        return np.dot(np.array(self.__evals).T,self.__coefficients)/self.__step_size
+        return np.dot(np.array(self.__evals).T,self.__coefficients[self.__coefficients.nonzero()])/self.__step_size
 
     @property
     def outputs(self):

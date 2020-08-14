@@ -7,6 +7,7 @@ class DifferentiationHelper:
     @staticmethod
     def get_finite_difference_coefficients(stencil, order_deriv):
         assert(len(stencil)>order_deriv)
+        assert(np.all(np.diff(stencil)==1.0))
 
         powers=np.arange(0, len(stencil), 1)
         stencil_grid, powers_grid = np.meshgrid(stencil, powers)
