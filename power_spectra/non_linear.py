@@ -114,7 +114,7 @@ class NonLinearPower(object):
 
         self.__temporary_power_spectrum_file = tempfile.NamedTemporaryFile()
 
-        np.savetxt(self.get_power_spectrum_path(), np.vstack([k_vals_h_invMpc * cosmo.h, pk_lin_vals / cosmo.h ** 3 / cosmo.norm]).T, delimiter='\t')
+        np.savetxt(self.get_power_spectrum_path(), np.vstack([k_vals_h_invMpc * cosmo.h, pk_lin_vals / cosmo.h ** 3 / cosmo.norm ** 2.0]).T, delimiter='\t')
 
         self.__class = Class()
         self.__class.set(cosmo.class_params)
@@ -124,8 +124,9 @@ class NonLinearPower(object):
                                    'IR resummation': ' Yes ',
                                    'Bias tracers': ' Yes ',
                                    'RSD': ' Yes ',
-                                   'AP': 'No',
+                                   'AP': 'Yes',
                                    'FFTLog mode': 'FAST',
+                                   'Omfid': 0.305713,
                                    'Input Pk': self.get_power_spectrum_path(),
                                    }
 

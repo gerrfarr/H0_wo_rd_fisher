@@ -48,11 +48,11 @@ class Cosmology(object):
 
     @property
     def norm(self):
-        return self.A_s/A_s_norm
+        return (self.A_s/A_s_norm)**(1/2)
 
     @norm.setter
     def norm(self, value):
-        self.A_s = value*A_s_norm
+        self.A_s = value**2.0*A_s_norm
 
     @property
     def computed(self):
