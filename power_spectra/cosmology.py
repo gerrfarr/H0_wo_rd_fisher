@@ -2,7 +2,11 @@
 this code provides basic cosmological parameters.
 It is designed to emulate the Cosmology class from nbodykit (https://github.com/bccp/nbodykit) while reducing complexity.
 
+There are two classes provided. "Cosmology" provides a simplified cosmological model without massive neutrinos that can be used with the Eisenstein-Hu transfer functiosn to obtain analytical power spectra. "ClassCosmology" takes as input parameters for the boltzmann solver Class and allows to vary all cosmological parameters implemented in Class.
+
 Jul 2020
+edited: Dec 2020
+Gerrit Farren
 """
 from classy import Class
 
@@ -27,8 +31,9 @@ class Cosmology(object):
         self.sound_horizon_scaling=sound_horizon_scaling
         self.N_eff=N_eff
 
-        self.__class = Class()
-        self.__computed = False
+        self._class = Class()
+        self._class.set(self.class_params)
+        self._computed = False
 
     @property
     def Omega0_m(self):
@@ -44,7 +49,7 @@ class Cosmology(object):
 
     @property
     def sigma8(self):
-        return self.__class.sigma8()
+        return self._class.sigma8()
 
     @property
     def norm(self):
@@ -56,13 +61,13 @@ class Cosmology(object):
 
     @property
     def computed(self):
-        return self.__computed
+        return self._computed
 
     def scale_independent_growth_factor(self, redshift):
-        return self.__class.scale_independent_growth_factor(redshift)
+        return self._class.scale_independent_growth_factor(redshift)
 
     def scale_independent_growth_factor_f(self, redshift):
-        return self.__class.scale_independent_growth_factor_f(redshift)
+        return self._class.scale_independent_growth_factor_f(redshift)
 
     @property
     def class_params(self):
@@ -73,29 +78,27 @@ class Cosmology(object):
             'h': self.h,
             'omega_b': self.omega_b,
             'omega_cdm': self.omega_cdm,
-            'output': 'mPk',
             'N_ncdm':0,
             'N_ur':self.N_eff
         }
 
     def get_class(self):
-        return self.__class
+        return self._class
 
     def compute(self, force=True):
-        if self.__computed and force:
-            self.__class.empty()
-        elif self.__computed and not force:
+        if self._computed and force:
+            self._class.empty()
+        elif self._computed and not force:
             print("Class has already computed all relevant properties.")
             return
 
-        self.__class.set(self.class_params)
-        self.__class.compute()
-        self.__computed = True
+        self._class.compute()
+        self._computed = True
 
     def clone(self, pre_computed=False):
-        if pre_computed and self.__computed:
+        if pre_computed and self._computed:
             return self
-        elif pre_computed and not self.__computed:
+        elif pre_computed and not self._computed:
             self.compute()
             return self
         else:
@@ -108,3 +111,71 @@ class Cosmology(object):
                 A_s=self.A_s,
                 sound_horizon_scaling=self.sound_horizon_scaling,
                 N_eff=self.N_eff)
+
+class ClassCosmology(Cosmology):
+    def __init__(self, class_params):
+
+        self.__class_params=class_params
+
+        self._class = Class()
+        self._class.set(self.class_params)
+        self._computed = False
+
+    @property
+    def h(self):
+        return self._class.h()
+
+    @property
+    def T0_cmb(self):
+        return self._class.T_cmb()
+
+    @property
+    def A_s(self):
+        return self._class.A_s()
+
+    @property
+    def n_s(self):
+        return self._class.n_s()
+
+    @property
+    def Omega0_b(self):
+        return self._class.Omega_b()
+
+    @property
+    def Omega0_cdm(self):
+        return self._class.omegach2()/self.h**2
+
+    @property
+    def Omega0_m(self):
+        return self._class.Omega0_m()
+
+    @property
+    def norm(self):
+        return (self.A_s / A_s_norm)**(1 / 2)
+
+    @norm.setter
+    def norm(self, value):
+        NotImplementedError("This function is not implemented here.")
+
+    @property
+    def class_params(self):
+        return self.__class_params
+
+    def compute(self, force=True):
+        if self._computed and force:
+            self._class.empty()
+        elif self._computed and not force:
+            print("Class has already computed all relevant properties.")
+            return
+
+        self._class.compute()
+        self._computed = True
+
+    def clone(self, pre_computed=False):
+        if pre_computed and self._computed:
+            return self
+        elif pre_computed and not self._computed:
+            self.compute()
+            return self
+        else:
+            return ClassCosmology(self.class_params)

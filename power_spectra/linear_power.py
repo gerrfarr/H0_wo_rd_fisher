@@ -3,12 +3,15 @@ code to produce linear matter power spectrum using Eisenstein-Hu tranfer functio
 heavily inspired by nbodykit
 
 Jul 2020
+Gerrit Farren
 """
 from .transfer_functions import *
 from .cosmology import Cosmology
 
 class LinearPower(object):
-    def __init__(self, cosmo, no_wiggle=False):
+
+
+    def __init__(self, cosmo, no_wiggle=False, sigma8_norm=None):
         """
 
         Parameters
@@ -25,8 +28,10 @@ class LinearPower(object):
         else:
             self._transfer = EisensteinHu(self.cosmo)
 
+        if sigma8_norm is None:
+            sigma8_norm = 0.8277107664698417
         self._norm=1.0
-        self._norm=(cosmo.sigma8 / self.sigma_r(8., 0.0))**2
+        self._norm=cosmo.norm*(sigma8_norm / self.sigma_r(8., 0.0))**2
 
     def __call__(self, k, z):
         r"""
@@ -45,6 +50,10 @@ class LinearPower(object):
         Pk = k ** self.cosmo.n_s * self._transfer(k, z) ** 2
         return self._norm * Pk
 
+    def derivative(self, k, z):#derivative with respect to sound horizon
+        T, dT = self._transfer(k, z, derivative=True)
+        dPk = 2*k ** self.cosmo.n_s * T * dT
+        return self._norm*dPk
 
     def sigma_r(self, r, z, kmin=1e-5, kmax=1e1):
         r"""

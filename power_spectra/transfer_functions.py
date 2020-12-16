@@ -61,7 +61,7 @@ class EisensteinHu():
         self.beta_node = 8.41 * self.Omh2 ** 0.435
         self.beta_b    = 0.5 + self.f_baryon + (3. - 2.*self.f_baryon) * numpy.sqrt( (17.2*self.Omh2) ** 2 + 1 )
 
-    def __call__(self, k, redshift):
+    def __call__(self, k, redshift, derivative=False, debug=False):
         r"""
         Return the Eisenstein-Hu transfer function with BAO wiggles.
         This is normalized to unity as :math:`k \rightarrow 0` at :math:`z=0`.
@@ -99,17 +99,33 @@ class EisensteinHu():
         f = lambda a, b : a / (a + b*q**2)
         T_c = T_c_f * f(T_c_ln_beta, T_c_C_noalpha) + (1-T_c_f) * f(T_c_ln_beta, T_c_C_alpha)
 
+        dT_c_f = -4*T_c_f**2*(ks/5.4)**4
+        dT_c = (f(T_c_ln_beta, T_c_C_noalpha) - f(T_c_ln_beta, T_c_C_alpha)) * dT_c_f
+
         s_tilde = self.sound_horizon * (1 + (self.beta_node/ks)**3) ** (-1./3.)
         ks_tilde = k*s_tilde
+        dks_tilde = (ks_tilde**3*self.beta_node**3/ks**6+1)*ks_tilde
 
         T_b_T0 = f(T_c_ln_nobeta, T_c_C_noalpha)
         T_b_1 = T_b_T0 / (1 + (ks/5.2)**2 )
         T_b_2 = self.alpha_b / (1 + (self.beta_b/ks)**3 ) * numpy.exp(-(k/self.k_silk) ** 1.4)
         T_b = numpy.sinc(ks_tilde/numpy.pi) * (T_b_1 + T_b_2)
 
+        dT_b_1=-T_b_1**2/T_b_T0*2*(ks/5.2)**2
+        dT_b_2=T_b_2*( 1+3*(self.beta_b/ks)**3/(1+(self.beta_b/ks)**3) )
+        dT_b = (ks_tilde*numpy.cos(ks_tilde) - numpy.sin(ks_tilde))/ks_tilde**2*dks_tilde*(T_b_1+T_b_2) + numpy.sinc(ks_tilde/numpy.pi)*(dT_b_1 + dT_b_2)
+
         T = numpy.ones(valid.shape)
         T[valid] = self.f_baryon*T_b + (1-self.f_baryon)*T_c;
-        return T * self.cosmo.scale_independent_growth_factor(redshift)
+        dT=numpy.zeros(valid.shape)
+        dT[valid]=self.f_baryon*dT_b + (1-self.f_baryon)*dT_c;
+        if debug:
+            return T_c_f, dT_c_f, T_c, dT_c, ks_tilde, dks_tilde, T_b_1, dT_b_1, T_b_2, dT_b_2, T_b, dT_b
+
+        if derivative:
+            return T * self.cosmo.scale_independent_growth_factor(redshift),dT * self.cosmo.scale_independent_growth_factor(redshift)
+        else:
+            return T * self.cosmo.scale_independent_growth_factor(redshift)
 
 class NoWiggleEisensteinHu(object):
     """
@@ -140,7 +156,7 @@ class NoWiggleEisensteinHu(object):
                             0.38* numpy.log(22.3*self.Omh2) * self.f_baryon ** 2
 
 
-    def __call__(self, k, redshift):
+    def __call__(self, k, redshift, derivative=False, debug=False):
         r"""
         Return the Eisenstein-Hu transfer function without BAO wiggles.
         This is normalized to unity as :math:`k \rightarrow 0` at :math:`z=0`.
@@ -170,10 +186,24 @@ class NoWiggleEisensteinHu(object):
         q = k / (13.41*self.k_eq)
 
         gamma_eff = self.Omh2 * (self.alpha_gamma + (1 - self.alpha_gamma) / (1 + (0.43*ks) ** 4))
+        dgamma_eff_dks = -4 * 0.43**4*ks**3*(1-self.alpha_gamma)/(1 + (0.43*ks) ** 4)**2*self.Omh2
+
         q_eff = q * self.Omh2 / gamma_eff
+        dq_eff_dgamma_eff = -q_eff/gamma_eff
+
         L0 = numpy.log(2*numpy.e + 1.8 * q_eff)
+        dL0_dq_eff = 1.8/(2*numpy.e+1.8*q_eff)
+
         C0 = 14.2 + 731.0 / (1 + 62.5 * q_eff)
+        dC0_dq_eff = - 731.0*62.5/(1+62.5*q_eff)**2
 
         T = numpy.ones(valid.shape)
         T[valid] = L0 / (L0 + C0 * q_eff**2)
-        return T * self.cosmo.scale_independent_growth_factor(redshift)
+        dT = numpy.zeros(valid.shape)
+        dT[valid] = (dL0_dq_eff*T/L0 - T**2/L0*(2*q_eff*C0 + q_eff**2* dC0_dq_eff + dL0_dq_eff))*dq_eff_dgamma_eff*dgamma_eff_dks*ks
+        if debug:
+            return ks, gamma_eff, dgamma_eff_dks, q_eff, dq_eff_dgamma_eff, L0, dL0_dq_eff, C0, dC0_dq_eff
+        if derivative:
+            return T * self.cosmo.scale_independent_growth_factor(redshift), dT*self.cosmo.scale_independent_growth_factor(redshift)
+        else:
+            return T * self.cosmo.scale_independent_growth_factor(redshift)
