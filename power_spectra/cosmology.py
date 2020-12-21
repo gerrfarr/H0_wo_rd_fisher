@@ -9,6 +9,7 @@ edited: Dec 2020
 Gerrit Farren
 """
 from classy import Class
+import numpy as np
 
 A_s_norm=2.0989e-9
 class Cosmology(object):
@@ -69,6 +70,12 @@ class Cosmology(object):
     def scale_independent_growth_factor_f(self, redshift):
         return self._class.scale_independent_growth_factor_f(redshift)
 
+    def Hubble(self, z):
+        return self._class.Hubble(z)
+
+    def angular_distance(self, z):
+        return self._class.angular_distance(z)
+
     @property
     def class_params(self):
         return {
@@ -113,11 +120,17 @@ class Cosmology(object):
                 N_eff=self.N_eff)
 
 class ClassCosmology(Cosmology):
-    def __init__(self, class_params):
+    def __init__(self, class_params,  ClassVersion=None):
 
         self.__class_params=class_params
 
-        self._class = Class()
+        if ClassVersion is None:
+            self.__ClassVersion = None
+            self._class = Class()
+        else:
+            self.__ClassVersion = ClassVersion
+            self._class = ClassVersion()
+
         self._class.set(self.class_params)
         self._computed = False
 
@@ -131,7 +144,10 @@ class ClassCosmology(Cosmology):
 
     @property
     def A_s(self):
-        return self._class.A_s()
+        try:
+            return float(self.__class_params['A_s'])
+        except KeyError:
+            return np.exp(float(self.__class_params['ln10^{10}A_s']))/1.0e10
 
     @property
     def n_s(self):
@@ -148,6 +164,10 @@ class ClassCosmology(Cosmology):
     @property
     def Omega0_m(self):
         return self._class.Omega0_m()
+
+    @property
+    def sound_horizon_scaling(self):
+        return 1.0
 
     @property
     def norm(self):
@@ -178,4 +198,4 @@ class ClassCosmology(Cosmology):
             self.compute()
             return self
         else:
-            return ClassCosmology(self.class_params)
+            return ClassCosmology(self.class_params, self.__ClassVersion)

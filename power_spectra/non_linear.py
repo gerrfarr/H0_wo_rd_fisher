@@ -20,27 +20,27 @@ from ..custom_exceptions import ClassComputationError, OrderOfOperationsError, P
 
 
 class BiasParams(object):
-    def __init__(self, b1=0.0, b2=0.0, bG2=0.0, css0=0.0, css2=0.0, css4=0.0, b4=0.0, Pshot=0.0, bGamma3=0.0, a0=0.0, a2=0.0):
+    def __init__(self, b1=0.0, b2=0.0, bG2=0.0, bGamma3=0.0, b4=0.0, css0=0.0, css2=0.0, css4=0.0, Pshot=0.0, a0=0.0, a2=0.0):
         self.b1 = b1
         self.b2 = b2
         self.bG2 = bG2
+        self.bGamma3 = bGamma3
+        self.b4 = b4
         self.css0 = css0
         self.css2 = css2
         self.css4 = css4
-        self.b4 = b4
         self.Pshot = Pshot
-        self.bGamma3 = bGamma3
         self.a0 = a0
         self.a2 = a2
 
     def clone(self):
-        return BiasParams(b1=self.b1, b2=self.b2, bG2=self.bG2, css0=self.css0, css2=self.css2, css4=self.css4, b4=self.b4, Pshot=self.Pshot, bGamma3=self.bGamma3, a0=self.a0, a2=self.a2)
+        return BiasParams(b1=self.b1, b2=self.b2, bG2=self.bG2, bGamma3=self.bGamma3, b4=self.b4, css0=self.css0, css2=self.css2, css4=self.css4, Pshot=self.Pshot, a0=self.a0, a2=self.a2)
 
-    def print(self):
-        print(f"b1={self.b1}, b2={self.b2}, bG2={self.bG2}, css0={self.css0}, css2={self.css2}, css4={self.css4}, b4={self.b4}, Pshot={self.Pshot}, bGamma3={self.bGamma3}, a0={self.a0}, a2={self.a2}")
+    def __repr__(self):
+        return f"b1={self.b1}, b2={self.b2}, bG2={self.bG2}, bGamma3={self.bGamma3}, b4={self.b4}, css0={self.css0}, css2={self.css2}, css4={self.css4}, Pshot={self.Pshot}, a0={self.a0}, a2={self.a2}"
 
     def get_tuple(self):
-        return self.b1, self.b2, self.bG2, self.css0, self.css2, self.css4, self.b4, self.Pshot, self.bGamma3, self.a0, self.a2
+        return self.b1, self.b2, self.bG2, self.bGamma3, self.b4, self.css0, self.css2, self.css4, self.Pshot, self.a0, self.a2
 
 class ParameterPackage(object):
     cosmo_param_names = ['h', 'T0_cmb', 'n_s', 'A_s', 'sound_horizon_scaling', 'N_eff', 'norm', 'omega_b', 'omega_cdm']
@@ -109,7 +109,7 @@ class ParameterPackage(object):
         return param_name in ParameterPackage.bias_param_names
 
 
-
+not_class_pt_params = ['fEDE', 'log10z_c', 'thetai_scf', 'n_scf', 'CC_scf']
 class NonLinearPower(object):
     def __init__(self, cosmo, redshift, Omfid=None, renormalize=True, no_wiggle=False):
         """
@@ -136,7 +136,10 @@ class NonLinearPower(object):
             self.__norm = 1.0
 
         self.__class = Class()
-        self.__class.set(cosmo.class_params)
+        params = cosmo.class_params
+        for key in not_class_pt_params:
+            params.pop(key, None)
+        self.__class.set(params)
 
         class_non_linear_params = {'output': "mPk",
                                    'z_pk': redshift,
@@ -338,13 +341,13 @@ class NonLinearPower(object):
 
 
 class NonLinearPowerReplace(NonLinearPower):
-    def __init__(self, cosmo, linPower, redshift, Omfid=None, k_vals_h_invMpc=None, no_wiggle=False):
+    def __init__(self, cosmo, linPower, redshift, Omfid=None, renormalize=True, k_vals_h_invMpc=None, no_wiggle=False):
 
-        super().__init__(cosmo, redshift, Omfid=Omfid, renormalize=True, no_wiggle=no_wiggle)
+        super().__init__(cosmo, redshift, Omfid=Omfid, renormalize=renormalize, no_wiggle=no_wiggle)
         self.__linPower = linPower
 
         if k_vals_h_invMpc is None:
-            self.__k_vals = np.logspace(-5, 3, 10000)
+            self.__k_vals = np.logspace(-5, 2, 10000)
         else:
             self.__k_vals = k_vals_h_invMpc
 
@@ -385,4 +388,4 @@ class NonLinearPowerReplace(NonLinearPower):
                               'DAz_replace': DA,
                               'Dz_replace': D,
                               'fz_replace': f}
-        self.__class.set(replacement_params)
+        self._NonLinearPower__class.set(replacement_params)

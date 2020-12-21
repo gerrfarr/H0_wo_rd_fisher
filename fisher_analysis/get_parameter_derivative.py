@@ -15,7 +15,7 @@ class ParamDerivatives(object):
     Class to compute derivatives with respect to a given parameter
 
     """
-    def __init__(self, fiducial_params, param_name, param_vals, eval_function, *function_args, stencil=None, **function_kwargs):
+    def __init__(self, fiducial_params, param_name, param_vals, eval_function, *function_args, stencil=None, verbose=False, **function_kwargs):
         """
 
         Parameters
@@ -38,6 +38,7 @@ class ParamDerivatives(object):
         self.__param_name = param_name
         self.__param_vals = param_vals
         self.__eval_function = eval_function
+        self.__verbose = verbose
         self.__args = function_args
         self.__kwargs = function_kwargs
 
@@ -65,13 +66,16 @@ class ParamDerivatives(object):
         if self.__derivs is None:
             start_copy = time.time()
             self.__cosmologies = self.__get_cosmologies()
-            print("It took {:.3f}s to create cosmo copies".format(time.time()-start_copy))
+            if self.__verbose:
+                print("It took {:.3f}s to create cosmo copies".format(time.time()-start_copy))
             start_evaluate = time.time()
             self.__evals = self.__evaluate()
-            print("It took {:.3f}s to evaluate the input function".format(time.time() - start_evaluate))
+            if self.__verbose:
+                print("It took {:.3f}s to evaluate the input function".format(time.time() - start_evaluate))
             start_derivs=time.time()
             self.__derivs = self.__get_derivatives()
-            print("It took {:.3f}s to generate derivatives".format(time.time() - start_derivs))
+            if self.__verbose:
+                print("It took {:.3f}s to generate derivatives".format(time.time() - start_derivs))
 
         return self.__derivs
 
