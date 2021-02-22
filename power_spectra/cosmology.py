@@ -8,7 +8,7 @@ Jul 2020
 edited: Dec 2020
 Gerrit Farren
 """
-from classy import Class
+from classy_pt import Class
 import numpy as np
 
 A_s_norm=2.0989e-9
@@ -21,6 +21,7 @@ class Cosmology(object):
             n_s=0.9667,
             A_s=2.0989e-9,
             sound_horizon_scaling=1.0,
+            peak_amp_scaling=1.0,
             N_eff=3.046):
 
         self.h=h
@@ -30,6 +31,7 @@ class Cosmology(object):
         self.n_s=n_s
         self.A_s=A_s
         self.sound_horizon_scaling=sound_horizon_scaling
+        self.peak_amp_scaling = peak_amp_scaling
         self.N_eff=N_eff
 
         self._class = Class()
@@ -117,6 +119,7 @@ class Cosmology(object):
                 n_s=self.n_s,
                 A_s=self.A_s,
                 sound_horizon_scaling=self.sound_horizon_scaling,
+                peak_amp_scaling=self.peak_amp_scaling,
                 N_eff=self.N_eff)
 
 class ClassCosmology(Cosmology):
@@ -167,6 +170,10 @@ class ClassCosmology(Cosmology):
 
     @property
     def sound_horizon_scaling(self):
+        return 1.0
+
+    @property
+    def peak_amp_scaling(self):
         return 1.0
 
     @property

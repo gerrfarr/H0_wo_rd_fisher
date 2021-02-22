@@ -109,7 +109,7 @@ class EisensteinHu():
         T_b_T0 = f(T_c_ln_nobeta, T_c_C_noalpha)
         T_b_1 = T_b_T0 / (1 + (ks/5.2)**2 )
         T_b_2 = self.alpha_b / (1 + (self.beta_b/ks)**3 ) * numpy.exp(-(k/self.k_silk) ** 1.4)
-        T_b = numpy.sinc(ks_tilde/numpy.pi) * (T_b_1 + T_b_2)
+        T_b = self.cosmo.peak_amp_scaling*numpy.sinc(ks_tilde/numpy.pi) * (T_b_1 + T_b_2)
 
         dT_b_1=-T_b_1**2/T_b_T0*2*(ks/5.2)**2
         dT_b_2=T_b_2*( 1+3*(self.beta_b/ks)**3/(1+(self.beta_b/ks)**3) )
