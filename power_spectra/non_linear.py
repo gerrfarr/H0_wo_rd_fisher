@@ -9,8 +9,10 @@ Gerrit Farren
 """
 
 import tempfile
+import os
+import time
 from copy import copy
-from classy import Class
+from classy_pt import Class
 import _warnings as warnings
 import numpy as np
 
@@ -43,7 +45,7 @@ class BiasParams(object):
         return self.b1, self.b2, self.bG2, self.bGamma3, self.b4, self.css0, self.css2, self.css4, self.Pshot, self.a0, self.a2
 
 class ParameterPackage(object):
-    cosmo_param_names = ['h', 'T0_cmb', 'n_s', 'A_s', 'sound_horizon_scaling', 'N_eff', 'norm', 'omega_b', 'omega_cdm']
+    cosmo_param_names = ['h', 'T0_cmb', 'n_s', 'A_s', 'sound_horizon_scaling', 'peak_amp_scaling', 'N_eff', 'norm', 'omega_b', 'omega_cdm']
     bias_param_names = ['b1', 'b2', 'bG2', 'css0', 'css2', 'css4', 'b4', 'Pshot', 'bGamma3', 'a0', 'a2']
     def __init__(self, cosmo, bias_params):
         """
@@ -351,6 +353,7 @@ class NonLinearPowerReplace(NonLinearPower):
         else:
             self.__k_vals = k_vals_h_invMpc
 
+
         pk_lin_vals = linPower(self.__k_vals, redshift)
 
         self.__temporary_power_spectrum_file = tempfile.NamedTemporaryFile()
@@ -360,13 +363,23 @@ class NonLinearPowerReplace(NonLinearPower):
         class_non_linear_params = {'Input Pk': self.get_power_spectrum_path()}
         self._NonLinearPower__class.set(class_non_linear_params)
 
-    def compute(self):
+    def compute(self, waited=False):
         try:
-            super().compute()
+            if not os.path.isfile(self.get_power_spectrum_path()):
+                if waited:
+                    print("There is a problem with the temporary file! Already waited once. Aborting!")
+                    raise ValueError("Temporary file not properly generated!")
+                else:
+                    print("There is a problem with the temporary file! Waiting and trying again")
+                    time.sleep(1)
+                    self.compute(waited=True)
+            else:
+                super().compute()
+                self.__temporary_power_spectrum_file.close()
         except ClassComputationError as ex:
-            raise ClassComputationError("Non-linear power spectra computation failed.")
-        finally:
             self.__temporary_power_spectrum_file.close()
+            raise ClassComputationError("Non-linear power spectra computation failed.")
+
 
     def get_power_spectrum_path(self):
         if not self.__temporary_power_spectrum_file.closed:
