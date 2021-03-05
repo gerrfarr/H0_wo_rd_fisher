@@ -12,7 +12,7 @@ from scipy.special import eval_legendre as legendre
 
 class euclid_bao_only(Likelihood):
     """# Set redshifts
-    z = [0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.]
+    z = [0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2.]
 
     # other input parameters
     data_directory = "/Users/gerrit/SynologyDrive/Cambridge/H0_project/data/EUCLID_mock_spectra/"
@@ -148,7 +148,7 @@ class euclid_bao_only(Likelihood):
         self.leg4 = self.leg4[np.newaxis, :, :]
 
 
-        self.full_cov = np.zeros(self.all_cov.shape)
+        self.full_invcov = np.zeros(self.all_cov.shape)
         ## Compute theoretical error envelope and combine with usual covariance
         P0, P2, P4 = self.pk_model(np.ones(self.z.shape), np.ones(self.z.shape))
         for index_z in range(self.n_bin):
@@ -200,7 +200,7 @@ class euclid_bao_only(Likelihood):
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
             # Compute precision matrix
-            self.full_cov[index_z] = cov_theoretical_error + self.all_cov[index_z]
+            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
 
 
     def pk_model(self, alpha_perp, alpha_par):
@@ -264,7 +264,7 @@ class euclid_bao_only(Likelihood):
 
             # NB: should use cholesky decomposition and triangular factorization when we need to invert arrays later
             mb = 0  # minimum bin
-            chi2 += float(np.matmul(resid_vec[mb:].T, np.matmul(self.full_cov[index_z, mb:, mb:], resid_vec[mb:])))
+            chi2 += float(np.matmul(resid_vec[mb:].T, np.matmul(self.full_invcov[index_z, mb:, mb:], resid_vec[mb:])))
 
         lkl = -0.5 * chi2
         return lkl
