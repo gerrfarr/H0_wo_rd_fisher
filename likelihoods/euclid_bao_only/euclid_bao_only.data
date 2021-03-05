@@ -1,0 +1,18 @@
+# Unreconstructed EUCLID multipole data
+euclid_bao_only.data_directory = "/Users/gerrit/SynologyDrive/Cambridge/H0_project/data/EUCLID_mock_spectra/"
+
+# Set redshifts
+euclid_bao_only.z = [0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2.]
+
+# other input parameters
+euclid_bao_only.cov_file = ["LCDM_covmats/euclid_mock_covmat_z1.dat","LCDM_covmats/euclid_mock_covmat_z2.dat","LCDM_covmats/euclid_mock_covmat_z3.dat", "LCDM_covmats/euclid_mock_covmat_z4.dat", "LCDM_covmats/euclid_mock_covmat_z5.dat", "LCDM_covmats/euclid_mock_covmat_z6.dat", "LCDM_covmats/euclid_mock_covmat_z7.dat", "LCDM_covmats/euclid_mock_covmat_z8.dat"]
+euclid_bao_only.theory_pk_file = ["LCDM_spectra/euclid_mock_lcdm_z1.dat","LCDM_spectra/euclid_mock_lcdm_z2.dat","LCDM_spectra/euclid_mock_lcdm_z3.dat", "LCDM_spectra/euclid_mock_lcdm_z4.dat", "LCDM_spectra/euclid_mock_lcdm_z5.dat", "LCDM_spectra/euclid_mock_lcdm_z6.dat", "LCDM_spectra/euclid_mock_lcdm_z7.dat", "LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+euclid_bao_only.file = ["LCDM_spectra/euclid_mock_lcdm_z1.dat","LCDM_spectra/euclid_mock_lcdm_z2.dat","LCDM_spectra/euclid_mock_lcdm_z3.dat", "LCDM_spectra/euclid_mock_lcdm_z4.dat", "LCDM_spectra/euclid_mock_lcdm_z5.dat", "LCDM_spectra/euclid_mock_lcdm_z6.dat", "LCDM_spectra/euclid_mock_lcdm_z7.dat", "LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+
+
+euclid_bao_only.use_quadrupole=True
+euclid_bao_only.use_hexadecapole=True
+
+euclid_bao_only.inflate_error=False
+
+euclid_bao_only.Delta_k = 0.1
