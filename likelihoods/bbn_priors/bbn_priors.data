@@ -1,0 +1,4 @@
+# BBN Inputs
+bbn_priors.omb_mean = 0.02253
+# same relative width as in Philcox+20
+bbn_priors.omb_std = 0.02253*0.00036/0.02268
