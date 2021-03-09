@@ -203,7 +203,7 @@ class euclid_bao_only(Likelihood):
             self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
 
 
-    def pk_model(self, alpha_perp, alpha_par):
+    def pk_model(self, alpha_perp, alpha_par, norm=1.0):
             ## must be in h/Mpc units
             ## Returns linear theory prediction for monopole and quadrupole
 
@@ -228,7 +228,7 @@ class euclid_bao_only(Likelihood):
             else:
                 P4_est = 0.
 
-            return P0_est, P2_est, P4_est
+            return norm*P0_est, norm*P2_est, norm*P4_est
 
 
     def loglkl(self, cosmo, data):
@@ -243,22 +243,27 @@ class euclid_bao_only(Likelihood):
         alpha_par = self.cosmo_fid.z_of_r(self.z)[1] * self.cosmo_fid.rs_drag() / (cosmo.z_of_r(self.z)[1] * cosmo.rs_drag())
         alpha_perp = cosmo.z_of_r(self.z)[0] * self.cosmo_fid.rs_drag() / (self.cosmo_fid.z_of_r(self.z)[0] * cosmo.rs_drag())
 
+        norm = data.mcmc_parameters['norm']['current']*data.mcmc_parameters['norm']['scale']
+
         ## Compute power spectrum multipoles
-        P0_predictions, P2_predictions, P4_predictions = self.pk_model(alpha_perp, alpha_par)
+        P0_predictions, P2_predictions, P4_predictions = self.pk_model(alpha_perp, alpha_par, norm=norm)
         #return P0_predictions, P2_predictions, P4_predictions
 
         # Compute chi2 for each z-mean
         for index_z in range(self.n_bin):
+            bias0 = data.mcmc_parameters[f'b0_{index_z}']['current']*data.mcmc_parameters[f'b0_{index_z}']['scale']
+            bias2 = data.mcmc_parameters[f'b2_{index_z}']['current'] * data.mcmc_parameters[f'b2_{index_z}']['scale']
+            bias4 = data.mcmc_parameters[f'b4_{index_z}']['current'] * data.mcmc_parameters[f'b4_{index_z}']['scale']
 
             # Create vector of residual pk
             if self.use_quadrupole and self.use_hexadecapole:
-                stacked_model = np.concatenate([P0_predictions[index_z], P2_predictions[index_z], P4_predictions[index_z]])
+                stacked_model = np.concatenate([bias0*P0_predictions[index_z], bias2*P2_predictions[index_z], bias4*P4_predictions[index_z]])
                 stacked_data = np.concatenate([self.Pk0_data[index_z], self.Pk2_data[index_z], self.Pk4_data[index_z]])
             elif self.use_quadrupole:
-                stacked_model = np.concatenate([P0_predictions[index_z], P2_predictions[index_z]])
+                stacked_model = np.concatenate([bias0*P0_predictions[index_z], bias2*P2_predictions[index_z]])
                 stacked_data = np.concatenate([self.Pk0_data[index_z], self.Pk2_data[index_z]])
             else:
-                stacked_model = P0_predictions[index_z]
+                stacked_model = bias0*P0_predictions[index_z]
                 stacked_data = self.Pk0_data[index_z]
             resid_vec = stacked_data - stacked_model
 
