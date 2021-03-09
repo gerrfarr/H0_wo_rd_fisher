@@ -251,9 +251,9 @@ class euclid_bao_only(Likelihood):
 
         # Compute chi2 for each z-mean
         for index_z in range(self.n_bin):
-            bias0 = data.mcmc_parameters['b0_{}'.format(index_z)]['current'] * data.mcmc_parameters['b0_{}'.format(index_z)]['scale']
-            bias2 = data.mcmc_parameters['b2_{}'.format(index_z)]['current'] * data.mcmc_parameters['b2_{}'.format(index_z)]['scale']
-            bias4 = data.mcmc_parameters['b4_{}'.format(index_z)]['current'] * data.mcmc_parameters['b4_{}'.format(index_z)]['scale']
+            bias0 = data.mcmc_parameters['b0_{}'.format(index_z+1)]['current'] * data.mcmc_parameters['b0_{}'.format(index_z+1)]['scale']
+            bias2 = data.mcmc_parameters['b2_{}'.format(index_z+1)]['current'] * data.mcmc_parameters['b2_{}'.format(index_z+1)]['scale']
+            bias4 = data.mcmc_parameters['b4_{}'.format(index_z+1)]['current'] * data.mcmc_parameters['b4_{}'.format(index_z+1)]['scale']
 
             # Create vector of residual pk
             if self.use_quadrupole and self.use_hexadecapole:
