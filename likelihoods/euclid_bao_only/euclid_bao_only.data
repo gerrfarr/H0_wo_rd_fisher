@@ -16,3 +16,5 @@ euclid_bao_only.use_hexadecapole=True
 euclid_bao_only.inflate_error=False
 
 euclid_bao_only.Delta_k = 0.1
+
+euclid_bao_only.use_nuisance=['norm']+['b0_{}'.format(z_i+1) for z_i in range(len(euclid_bao_only.z))]+['b2_{}'.format(z_i+1) for z_i in range(len(euclid_bao_only.z))]+['b4_{}'.format(z_i+1) for z_i in range(len(euclid_bao_only.z))]
