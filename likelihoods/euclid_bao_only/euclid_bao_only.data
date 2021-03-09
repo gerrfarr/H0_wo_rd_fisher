@@ -1,5 +1,5 @@
 # Unreconstructed EUCLID multipole data
-euclid_bao_only.data_directory = "/Users/gerrit/SynologyDrive/Cambridge/H0_project/data/EUCLID_mock_spectra/"
+euclid_bao_only.data_directory = "/home/gfarren/H0_kEq/scratch/data/EUCLID_mock_spectra/"
 
 # Set redshifts
 euclid_bao_only.z = [0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2.]
