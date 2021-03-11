@@ -13,7 +13,7 @@ euclid_bao_only.file = ["LCDM_spectra/euclid_mock_lcdm_z1.dat","LCDM_spectra/euc
 euclid_bao_only.use_quadrupole=True
 euclid_bao_only.use_hexadecapole=True
 
-euclid_bao_only.inflate_error=False
+euclid_bao_only.inflate_error=True
 
 euclid_bao_only.Delta_k = 0.1
 
