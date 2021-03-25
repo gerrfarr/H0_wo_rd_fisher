@@ -24,8 +24,8 @@ class EisensteinHu():
         self.cosmo = cosmo
 
         self.Obh2 = cosmo.Omega0_b * cosmo.h ** 2
-        self.Omh2 = cosmo.Omega0_m * cosmo.h ** 2
-        self.f_baryon = cosmo.Omega0_b / cosmo.Omega0_m
+        self.Omh2 = (cosmo.Omega0_b + cosmo.Omega0_cdm) * cosmo.h ** 2
+        self.f_baryon = self.Obh2 / self.Omh2
         self.theta_cmb = cosmo.T0_cmb / 2.7
 
         # redshift and wavenumber of equality
