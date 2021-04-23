@@ -1,13 +1,9 @@
 from montepython.likelihood_class import Likelihood
 import os
 import numpy as np
-import warnings
-from scipy.interpolate import interp1d,InterpolatedUnivariateSpline
-from scipy.special import gamma
-from scipy.integrate import simps
+from scipy.interpolate import interp1d
 from scipy.special.orthogonal import p_roots
 from classy import Class
-from copy import copy
 from scipy.special import eval_legendre as legendre
 
 class euclid_bao_only(Likelihood):
@@ -29,7 +25,7 @@ class euclid_bao_only(Likelihood):
 
     def __init__(self, path,data,command_line):
 
-        Likelihood.__init__(self, path, data, command_line)
+        #Likelihood.__init__(self, path, data, command_line)
 
         self.z = np.asarray(self.z)
         self.n_bin = np.shape(self.z)[0]
@@ -55,23 +51,10 @@ class euclid_bao_only(Likelihood):
         self.Pk2_data = None
         self.Pk4_data = None
 
-        print(self.data_directory)
-        # read data files in each redshift bin
-        for index_z in range(self.n_bin):
+        self.k_vals, self.Pk_theory_interp = self.interpolate_theory_spectrum(self.theory_pk_file)
+        dump, self.Pk_theory_nw_interp = self.interpolate_theory_spectrum(self.theory_pk_file_nw)
 
-            data = np.loadtxt(os.path.join(self.data_directory, self.file[index_z]))
-            # define input arrays
-            if index_z == 0:
-                self.k_vals = data[:,0]
-                self.Pk0_data = np.zeros((self.n_bin, len(data[:,0])))
-                self.Pk2_data = np.zeros((self.n_bin, len(data[:,0])))
-                self.Pk4_data = np.zeros((self.n_bin, len(data[:,0])))
-
-            self.Pk0_data[index_z] = data[:,1]
-            if self.use_quadrupole:
-                self.Pk2_data[index_z] = data[:,2]
-            if self.use_hexadecapole:
-                self.Pk4_data[index_z] = data[:,3]
+        self.wiggle_only_interp = lambda k, mu: self.Pk_theory_interp(k, mu) - self.Pk_theory_nw_interp(k, mu)
 
         self.muGrid, self.kGrid = np.meshgrid(self.gauss_mu, self.k_vals)
         self.wGrid = np.einsum('i,j->ij', np.ones(self.k_vals.shape), self.gauss_w)[np.newaxis, :, :]
@@ -102,44 +85,6 @@ class euclid_bao_only(Likelihood):
                     raise Exception('Need correct size covariance for monopole-only analysis')
 
             self.all_cov[index_z]=this_cov
-
-        self.k_vals_theory = None
-        self.Pk0_theory = None
-        self.Pk0_theory_interp = None
-        self.Pk2_theory = None
-        self.Pk2_theory_interp = None
-        self.Pk4_theory = None
-        self.Pk4_theory_interp = None
-
-        self.Pk_theory_interp = None
-
-        #load theory power spectra
-        for index_z in range(self.n_bin):
-            data = np.loadtxt(os.path.join(self.data_directory, self.theory_pk_file[index_z]))
-
-            if index_z == 0:
-                self.k_vals_theory = data[:,0]
-                self.Pk0_theory = np.zeros((self.n_bin, len(data[:,0])))
-                self.Pk2_theory = np.zeros((self.n_bin, len(data[:,0])))
-                self.Pk4_theory = np.zeros((self.n_bin, len(data[:, 0])))
-
-            self.Pk0_theory[index_z] = data[:,1]
-            if self.use_quadrupole:
-                self.Pk2_theory[index_z] = data[:,2]
-            if self.use_hexadecapole:
-                self.Pk4_theory[index_z] = data[:,3]
-
-        self.Pk0_theory_interp = interp1d(self.k_vals_theory, self.Pk0_theory, fill_value="extrapolate")
-        if self.use_quadrupole and self.use_hexadecapole:
-            self.Pk2_theory_interp = interp1d(self.k_vals_theory, self.Pk2_theory, fill_value="extrapolate")
-            self.Pk4_theory_interp = interp1d(self.k_vals_theory, self.Pk4_theory, fill_value="extrapolate")
-
-            self.Pk_theory_interp = lambda k, mu: self.Pk0_theory_interp(k)*legendre(0,mu)+self.Pk2_theory_interp(k)*legendre(2,mu)+self.Pk4_theory_interp(k)*legendre(4,mu)
-        elif self.use_quadrupole:
-            self.Pk2_theory_interp = interp1d(self.k_vals_theory, self.Pk2_theory, fill_value="extrapolate")
-            self.Pk_theory_interp = lambda k, mu: self.Pk0_theory_interp(k) * legendre(0, mu) + self.Pk2_theory_interp(k) * legendre(2, mu)
-        else:
-            self.Pk_theory_interp = lambda k, mu: self.Pk0_theory_interp(k) * legendre(0, mu)
 
         # Now define multipoles
         self.leg2 = legendre(2,self.muGrid)#0.5 * (3. * np.power(self.muGrid, 2.) - 1.)
@@ -199,8 +144,62 @@ class euclid_bao_only(Likelihood):
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
-            # Compute precision matrix
-            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
+            if self.alpha_prior > 0.0:
+                rs_marg_matrix = np.loadtxt(os.path.join(self.data_directory, self.rs_marg_matrices[index_z]))
+                if self.use_quadrupole and self.use_hexadecapole:
+                    if len(rs_marg_matrix) == len(self.k_vals) * 3:
+                        pass
+                    else:
+                        raise Exception('Need correct size covariance for monopole+quadrupole+hexadecapole analysis')
+                elif self.use_quadrupole:
+                    if len(rs_marg_matrix) == len(self.k_vals) * 2:
+                        pass
+                    elif len(rs_marg_matrix) == len(self.k_vals) * 3:
+                        rs_marg_matrix = rs_marg_matrix[:2 * len(self.k_vals), :2 * len(self.k_vals)]
+                    else:
+                        raise Exception('Need correct size covariance for monopole+quadrupole analysis')
+                else:
+                    if len(rs_marg_matrix) == len(self.k_vals):
+                        pass
+                    elif len(rs_marg_matrix) == len(self.k_vals) * 2 or len(rs_marg_matrix) == len(self.k_vals) * 3:
+                        rs_marg_matrix = rs_marg_matrix[:len(self.k_vals), :len(self.k_vals)]
+                    else:
+                        raise Exception('Need correct size covariance for monopole-only analysis')
+
+                self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + rs_marg_matrix * self.alpha_prior**2 + self.all_cov[index_z])
+            else:
+                self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
+
+    def interpolate_theory_spectrum(self, files):
+        # load theory power spectra
+        for index_z in range(self.n_bin):
+            data = np.loadtxt(os.path.join(self.data_directory, files[index_z]))
+
+            if index_z == 0:
+                k_vals_theory = data[:, 0]
+                Pk0_theory = np.zeros((self.n_bin, len(data[:, 0])))
+                Pk2_theory = np.zeros((self.n_bin, len(data[:, 0])))
+                Pk4_theory = np.zeros((self.n_bin, len(data[:, 0])))
+
+            Pk0_theory[index_z] = data[:, 1]
+            if self.use_quadrupole:
+                Pk2_theory[index_z] = data[:, 2]
+            if self.use_hexadecapole:
+                Pk4_theory[index_z] = data[:, 3]
+
+        Pk0_theory_interp = interp1d(k_vals_theory, Pk0_theory, fill_value="extrapolate")
+        if self.use_quadrupole and self.use_hexadecapole:
+            Pk2_theory_interp = interp1d(k_vals_theory, Pk2_theory, fill_value="extrapolate")
+            Pk4_theory_interp = interp1d(k_vals_theory, Pk4_theory, fill_value="extrapolate")
+
+            Pk_theory_interp = lambda k, mu: Pk0_theory_interp(k) * legendre(0, mu) + Pk2_theory_interp(k) * legendre(2, mu) + Pk4_theory_interp(k) * legendre(4, mu)
+        elif self.use_quadrupole:
+            Pk2_theory_interp = interp1d(k_vals_theory, Pk2_theory, fill_value="extrapolate")
+            Pk_theory_interp = lambda k, mu: Pk0_theory_interp(k) * legendre(0, mu) + Pk2_theory_interp(k) * legendre(2, mu)
+        else:
+            Pk_theory_interp = lambda k, mu: Pk0_theory_interp(k) * legendre(0, mu)
+
+        return k_vals_theory, Pk_theory_interp
 
 
     def pk_model(self, alpha_perp, alpha_par, norm=1.0):
@@ -213,7 +212,7 @@ class euclid_bao_only(Likelihood):
             k1 = self.kGrid[np.newaxis,:,:] / alpha_perp[:, np.newaxis, np.newaxis] * np.sqrt(1. + np.power(self.muGrid[np.newaxis,:,:], 2.) * (np.power(F[:, np.newaxis, np.newaxis], -2.) - 1.))
             mu1 = self.muGrid[np.newaxis,:,:] / (F[:, np.newaxis, np.newaxis] * np.sqrt(1. + np.power(self.muGrid[np.newaxis,:,:], 2.) * (np.power(F[:, np.newaxis, np.newaxis], -2.) - 1.)))
 
-            P_k_mu = self.Pk_theory_interp(k1, mu1).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])
+            P_k_mu = self.Pk_theory_nw_interp(self.kGrid[np.newaxis,:,:], self.muGrid[np.newaxis,:,:]).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])+self.wiggle_only_interp(k1, mu1).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])
 
             # Use Gaussian quadrature for fast integral evaluation
             P0_est = np.sum(P_k_mu*self.wGrid, axis=-1) / 2.
