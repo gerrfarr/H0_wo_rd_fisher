@@ -51,6 +51,21 @@ class euclid_bao_only(Likelihood):
         self.Pk2_data = None
         self.Pk4_data = None
 
+        for index_z in range(self.n_bin):
+            data = np.loadtxt(os.path.join(self.data_directory, self.file[index_z]))
+            # define input arrays
+            if index_z == 0:
+                self.k_vals = data[:, 0]
+                self.Pk0_data = np.zeros((self.n_bin, len(data[:, 0])))
+                self.Pk2_data = np.zeros((self.n_bin, len(data[:, 0])))
+                self.Pk4_data = np.zeros((self.n_bin, len(data[:, 0])))
+
+            self.Pk0_data[index_z] = data[:, 1]
+            if self.use_quadrupole:
+                self.Pk2_data[index_z] = data[:, 2]
+            if self.use_hexadecapole:
+                self.Pk4_data[index_z] = data[:, 3]
+
         self.k_vals, self.Pk_theory_interp = self.interpolate_theory_spectrum(self.theory_pk_file)
         dump, self.Pk_theory_nw_interp = self.interpolate_theory_spectrum(self.theory_pk_file_nw)
 
