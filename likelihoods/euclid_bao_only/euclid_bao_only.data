@@ -1,15 +1,15 @@
 # Unreconstructed EUCLID multipole data
-euclid_bao_only.data_directory = "/home/gfarren/H0_kEq/data/EUCLID_mock_spectra/"
+euclid_bao_only.data_directory = "/home/r/rbond/gfarren/H0_kEq/data/"
 
 # Set redshifts
 euclid_bao_only.z = [0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2.]
 
 # other input parameters
-euclid_bao_only.cov_file = ["LCDM_covmats/euclid_mock_covmat_z1.dat","LCDM_covmats/euclid_mock_covmat_z2.dat","LCDM_covmats/euclid_mock_covmat_z3.dat", "LCDM_covmats/euclid_mock_covmat_z4.dat", "LCDM_covmats/euclid_mock_covmat_z5.dat", "LCDM_covmats/euclid_mock_covmat_z6.dat", "LCDM_covmats/euclid_mock_covmat_z7.dat", "LCDM_covmats/euclid_mock_covmat_z8.dat"]
-euclid_bao_only.theory_pk_file = ["LCDM_spectra/euclid_mock_lcdm_z1.dat","LCDM_spectra/euclid_mock_lcdm_z2.dat","LCDM_spectra/euclid_mock_lcdm_z3.dat", "LCDM_spectra/euclid_mock_lcdm_z4.dat", "LCDM_spectra/euclid_mock_lcdm_z5.dat", "LCDM_spectra/euclid_mock_lcdm_z6.dat", "LCDM_spectra/euclid_mock_lcdm_z7.dat", "LCDM_spectra/euclid_mock_lcdm_z8.dat"]
-euclid_bao_only.theory_pk_file_nw = ["LCDM_spectra_nw/euclid_mock_lcdm_z1.dat","LCDM_spectra_nw/euclid_mock_lcdm_z2.dat","LCDM_spectra_nw/euclid_mock_lcdm_z3.dat", "LCDM_spectra_nw/euclid_mock_lcdm_z4.dat", "LCDM_spectra_nw/euclid_mock_lcdm_z5.dat", "LCDM_spectra_nw/euclid_mock_lcdm_z6.dat", "LCDM_spectra/euclid_mock_lcdm_z7.dat", "LCDM_spectra_nw/euclid_mock_lcdm_z8.dat"]
+euclid_bao_only.cov_file = ["EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z1.dat","EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z2.dat","EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z3.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z4.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z5.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z6.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z7.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z8.dat"]
+euclid_bao_only.theory_pk_file = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+euclid_bao_only.theory_pk_file_nw = ["EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z1.dat","EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z2.dat","EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat", "EUCLID_mock_spectra/LCDM_spectra_nw/euclid_mock_lcdm_z8.dat"]
 
-euclid_bao_only.file = ["LCDM_spectra/euclid_mock_lcdm_z1.dat","LCDM_spectra/euclid_mock_lcdm_z2.dat","LCDM_spectra/euclid_mock_lcdm_z3.dat", "LCDM_spectra/euclid_mock_lcdm_z4.dat", "LCDM_spectra/euclid_mock_lcdm_z5.dat", "LCDM_spectra/euclid_mock_lcdm_z6.dat", "LCDM_spectra/euclid_mock_lcdm_z7.dat", "LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+euclid_bao_only.file = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
 
 
 euclid_bao_only.use_quadrupole=True
@@ -17,7 +17,7 @@ euclid_bao_only.use_hexadecapole=True
 
 euclid_bao_only.inflate_error=False
 euclid_bao_only.alpha_prior=0.0
-euclid_bao_only.rs_marg_matrices = ["EUCLID_marg_matrices/rs_marg/rs_marg_z1.dat","EUCLID_marg_matrices/rs_marg/rs_marg_z2.dat","EUCLID_marg_matrices/rs_marg/rs_marg_z3.dat", "EUCLID_marg_matrices/rs_marg/rs_marg_z4.dat", "EUCLID_marg_matrices/rs_marg/rs_marg_z5.dat", "EUCLID_marg_matrices/rs_marg/rs_marg_z6.dat", "EUCLID_marg_matrices/rs_marg/rs_marg_z7.dat", "EUCLID_marg_matrices/rs_marg/rs_marg_z8.dat"]
+euclid_bao_only.rs_marg_matrices = ["EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z1.dat","EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z2.dat","EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z3.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z4.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z5.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z6.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z7.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z8.dat"]
 
 euclid_bao_only.Delta_k = 0.1
 

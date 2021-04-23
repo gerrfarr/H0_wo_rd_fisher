@@ -25,7 +25,7 @@ class euclid_bao_only(Likelihood):
 
     def __init__(self, path,data,command_line):
 
-        #Likelihood.__init__(self, path, data, command_line)
+        Likelihood.__init__(self, path, data, command_line)
 
         self.z = np.asarray(self.z)
         self.n_bin = np.shape(self.z)[0]
