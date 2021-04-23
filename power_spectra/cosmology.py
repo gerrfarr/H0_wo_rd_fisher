@@ -10,6 +10,7 @@ Gerrit Farren
 """
 from classy_pt import Class
 import numpy as np
+from copy import copy
 
 A_s_norm=2.0989e-9
 class Cosmology(object):
@@ -94,6 +95,12 @@ class Cosmology(object):
     def get_class(self):
         return self._class
 
+    def z_of_r(self, z):
+        return self._class.z_of_r(z)
+
+    def rs_drag(self):
+        return self.sound_horizon_scaling*self._class.rs_drag()
+
     def compute(self, force=True):
         if self._computed and force:
             self._class.empty()
@@ -123,7 +130,7 @@ class Cosmology(object):
                 N_eff=self.N_eff)
 
 class ClassCosmology(Cosmology):
-    def __init__(self, class_params,  ClassVersion=None):
+    def __init__(self, class_params,  ClassVersion=None, automatically_recompute=True):
 
         self.__class_params=class_params
 
@@ -134,12 +141,11 @@ class ClassCosmology(Cosmology):
             self.__ClassVersion = ClassVersion
             self._class = ClassVersion()
 
-        self._class.set(self.class_params)
+        self._class.set(self.__class_params)
         self._computed = False
+        self.__automatically_recompute=automatically_recompute
 
-    @property
-    def h(self):
-        return self._class.h()
+        self.sound_horizon_scaling = 1.0
 
     @property
     def T0_cmb(self):
@@ -152,9 +158,21 @@ class ClassCosmology(Cosmology):
         except KeyError:
             return np.exp(float(self.__class_params['ln10^{10}A_s']))/1.0e10
 
+    @A_s.setter
+    def A_s(self, new):
+        self.__class_params['A_s'] = new
+        if self.__automatically_recompute:
+            self.compute(force=True)
+
     @property
     def n_s(self):
         return self._class.n_s()
+
+    @n_s.setter
+    def n_s(self, new):
+        self.__class_params['n_s'] = new
+        if self.__automatically_recompute:
+            self.compute(force=True)
 
     @property
     def Omega0_b(self):
@@ -162,15 +180,11 @@ class ClassCosmology(Cosmology):
 
     @property
     def Omega0_cdm(self):
-        return self._class.omegach2()/self.h**2
+        return self._class.Omega0_cdm()
 
     @property
     def Omega0_m(self):
         return self._class.Omega0_m()
-
-    @property
-    def sound_horizon_scaling(self):
-        return 1.0
 
     @property
     def peak_amp_scaling(self):
@@ -185,6 +199,36 @@ class ClassCosmology(Cosmology):
         NotImplementedError("This function is not implemented here.")
 
     @property
+    def omega_cdm(self):
+        return self.__class_params['omega_cdm']
+
+    @omega_cdm.setter
+    def omega_cdm(self, new):
+        self.__class_params['omega_cdm'] = new
+        if self.__automatically_recompute:
+            self.compute(force=True)
+
+    @property
+    def h(self):
+        return self.__class_params['h']
+
+    @h.setter
+    def h(self, new):
+        self.__class_params['h'] = new
+        if self.__automatically_recompute:
+            self.compute(force=True)
+
+    @property
+    def omega_b(self):
+        return self.__class_params['omega_b']
+
+    @omega_b.setter
+    def omega_b(self, new):
+        self.__class_params['omega_b'] = new
+        if self.__automatically_recompute:
+            self.compute(force=True)
+
+    @property
     def class_params(self):
         return self.__class_params
 
@@ -195,6 +239,7 @@ class ClassCosmology(Cosmology):
             print("Class has already computed all relevant properties.")
             return
 
+        self._class.set(self.__class_params)
         self._class.compute()
         self._computed = True
 
@@ -205,4 +250,15 @@ class ClassCosmology(Cosmology):
             self.compute()
             return self
         else:
-            return ClassCosmology(self.class_params, self.__ClassVersion)
+            return ClassCosmology(copy(self.__class_params), self.__ClassVersion)
+
+    def copy_as_non_class(self):
+        return Cosmology(
+            h=self.h,
+            T0_cmb=self.T0_cmb,
+            omega_b=self.omega_b,
+            omega_cdm=self.omega_cdm,
+            n_s=self.n_s,
+            A_s=self.A_s,
+            sound_horizon_scaling=self.sound_horizon_scaling,
+            peak_amp_scaling=self.peak_amp_scaling)
