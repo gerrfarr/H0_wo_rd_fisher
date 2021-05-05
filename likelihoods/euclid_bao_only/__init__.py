@@ -7,21 +7,33 @@ from classy import Class
 from scipy.special import eval_legendre as legendre
 
 class euclid_bao_only(Likelihood):
-    """# Set redshifts
-    z = [0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2.]
+    """# Unreconstructed EUCLID multipole data
+    data_directory = "/Users/gerrit/SynologyDrive/Cambridge/H0_project/data/"
+
+    # Set redshifts
+    z = [0.6, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.]
 
     # other input parameters
-    data_directory = "/Users/gerrit/SynologyDrive/Cambridge/H0_project/data/EUCLID_mock_spectra/"
-    cov_file = ["LCDM_covmats/euclid_mock_covmat_z1.dat", "LCDM_covmats/euclid_mock_covmat_z2.dat", "LCDM_covmats/euclid_mock_covmat_z3.dat", "LCDM_covmats/euclid_mock_covmat_z4.dat", "LCDM_covmats/euclid_mock_covmat_z5.dat", "LCDM_covmats/euclid_mock_covmat_z6.dat", "LCDM_covmats/euclid_mock_covmat_z7.dat", "LCDM_covmats/euclid_mock_covmat_z8.dat"]
-    theory_pk_file = ["LCDM_spectra/euclid_mock_lcdm_z1.dat", "LCDM_spectra/euclid_mock_lcdm_z2.dat", "LCDM_spectra/euclid_mock_lcdm_z3.dat", "LCDM_spectra/euclid_mock_lcdm_z4.dat", "LCDM_spectra/euclid_mock_lcdm_z5.dat", "LCDM_spectra/euclid_mock_lcdm_z6.dat", "LCDM_spectra/euclid_mock_lcdm_z7.dat", "LCDM_spectra/euclid_mock_lcdm_z8.dat"]
-    file = theory_pk_file
+    cov_file = ["EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z1.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z2.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z3.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z4.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z5.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z6.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z7.dat",
+                                "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z8.dat"]
+    theory_pk_file = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat",
+                                      "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+    theory_pk_file_nw = ["EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z1.dat", "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z2.dat", "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z7.dat",
+                                         "EUCLID_mock_spectra/LCDM_nw_spectra/euclid_mock_lcdm_z8.dat"]
 
-    use_quadrupole=True
-    use_hexadecapole=True
+    file = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat",
+                            "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
 
-    inflate_error=False
+    use_quadrupole = True
+    use_hexadecapole = True
 
-    Delta_k = 0.1"""
+    inflate_error = False
+    alpha_prior = 0.0
+    rs_marg_matrices = ["EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z1.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z2.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z3.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z4.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z5.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z6.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z7.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z8.dat"]
+
+    Delta_k = 0.1
+
+    use_nuisance = ['norm'] + ['b0_{}'.format(z_i + 1) for z_i in range(len(z))] + ['b2_{}'.format(z_i + 1) for z_i in range(len(z))] + ['b4_{}'.format(z_i + 1) for z_i in range(len(z))]"""
 
     def __init__(self, path,data,command_line):
 
@@ -227,7 +239,7 @@ class euclid_bao_only(Likelihood):
             k1 = self.kGrid[np.newaxis,:,:] / alpha_perp[:, np.newaxis, np.newaxis] * np.sqrt(1. + np.power(self.muGrid[np.newaxis,:,:], 2.) * (np.power(F[:, np.newaxis, np.newaxis], -2.) - 1.))
             mu1 = self.muGrid[np.newaxis,:,:] / (F[:, np.newaxis, np.newaxis] * np.sqrt(1. + np.power(self.muGrid[np.newaxis,:,:], 2.) * (np.power(F[:, np.newaxis, np.newaxis], -2.) - 1.)))
 
-            P_k_mu = self.Pk_theory_nw_interp(self.kGrid[np.newaxis,:,:], self.muGrid[np.newaxis,:,:]).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])+self.wiggle_only_interp(k1, mu1).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])
+            P_k_mu = self.Pk_theory_nw_interp(self.kGrid, self.muGrid)+self.wiggle_only_interp(k1, mu1).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])
 
             # Use Gaussian quadrature for fast integral evaluation
             P0_est = np.sum(P_k_mu*self.wGrid, axis=-1) / 2.
