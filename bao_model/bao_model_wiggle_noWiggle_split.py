@@ -184,7 +184,7 @@ class BAOPowerModel(object):
         k1 = kGrid[np.newaxis,:,:] / alpha_perp[:, np.newaxis, np.newaxis] * np.sqrt(1. + np.power(muGrid[np.newaxis,:,:], 2.) * (np.power(F[:, np.newaxis, np.newaxis], -2.) - 1.))
         mu1 = muGrid[np.newaxis,:,:] / (F[:, np.newaxis, np.newaxis] * np.sqrt(1. + np.power(muGrid[np.newaxis,:,:], 2.) * (np.power(F[:, np.newaxis, np.newaxis], -2.) - 1.)))
 
-        P_k_mu = self.Pk_theory_nw_interp(kGrid[np.newaxis,:,:], muGrid[np.newaxis,:,:]).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])+self.wiggle_only_interp(k1, mu1).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])
+        P_k_mu = self.Pk_theory_nw_interp(kGrid, muGrid)+self.wiggle_only_interp(k1, mu1).diagonal(axis1=0, axis2=1).transpose([2, 0, 1])
 
         # Use Gaussian quadrature for fast integral evaluation
         P0_est = np.sum(P_k_mu*wGrid, axis=-1) / 2.
