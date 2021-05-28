@@ -1,0 +1,4 @@
+alpha_rs_priors.mean = 1.0
+alpha_rs_priors.std = 0.2
+
+alpha_rs_priors.use_nuisance = ['alpha_rs']
