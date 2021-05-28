@@ -1,0 +1,13 @@
+euclid_P1loopAP.data_directory = "/home/r/rbond/gfarren/H0_kEq/data/"
+euclid_P1loopAP.zsize = 8
+euclid_P1loopAP.ksize = 40
+euclid_P1loopAP.z      = [0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0]
+euclid_P1loopAP.use_nuisance = ['norm','b1_1','b1_2','b1_3','b1_4','b1_5','b1_6','b1_7','b1_8','b2_1','b2_2','b2_3','b2_4','b2_5','b2_6','b2_7','b2_8','bG2_1','bG2_2','bG2_3','bG2_4','bG2_5','bG2_6','bG2_7','bG2_8', 'alpha_rs']
+# testing only
+euclid_P1loopAP.test = False
+# k^2 shot-noise piece (analytically marginalized)
+euclid_P1loopAP.include_a2 = True
+
+euclid_P1loopAP.measurements_file = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+euclid_P1loopAP.covmat_file = ["EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z1.dat","EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z2.dat","EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z3.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z4.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z5.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z6.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z7.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z8.dat"]
+
