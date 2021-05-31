@@ -233,6 +233,9 @@ class euclid_P1loopAP(Likelihood_prior):
 
             chi2 += (b2[z_i]/norm - self.b2fid[z_i])**2./b2sig**2. + (bG2[z_i]/norm - self.bG2fid[z_i])**2./bG2sig**2.
 
+        if self.use_alpha_rs_prior:
+            chi2 += (alpha_rs - 1.0)**2. / self.alpha_rs_prior**2.
+
         #print("chi2_euclidP=", chi2)
         loglkl = -0.5 * chi2
 
