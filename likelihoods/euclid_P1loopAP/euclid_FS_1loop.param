@@ -114,6 +114,9 @@ data.cosmo_arguments['z_max_pk'] = '10.'
 
 euclid_P1loopAP.prior_inflation = True
 
+euclid_P1loopAP.use_alpha_rs_prior = True
+euclid_P1loopAP.alpha_rs_prior = 0.1
+
 #------ Mcmc parameters ----
 
 data.N=10
