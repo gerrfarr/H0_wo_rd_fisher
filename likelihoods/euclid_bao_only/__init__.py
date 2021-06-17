@@ -265,11 +265,14 @@ class euclid_bao_only(Likelihood):
         cosmo : Class
         """
         chi2 = 0.0
-
-        alpha_par = self.cosmo_fid.z_of_r(self.z)[1] * self.cosmo_fid.rs_drag() / (cosmo.z_of_r(self.z)[1] * cosmo.rs_drag())
-        alpha_perp = cosmo.z_of_r(self.z)[0] * self.cosmo_fid.rs_drag() / (self.cosmo_fid.z_of_r(self.z)[0] * cosmo.rs_drag())
-
+        
         norm = data.mcmc_parameters['norm']['current']*data.mcmc_parameters['norm']['scale']
+        alpha_rs = data.mcmc_parameters['alpha_rs']['current']*data.mcmc_parameters['alpha_rs']['scale']
+
+        alpha_par = self.cosmo_fid.z_of_r(self.z)[1] * self.cosmo_fid.rs_drag() / (cosmo.z_of_r(self.z)[1] * alpha_rs * cosmo.rs_drag())
+        alpha_perp = cosmo.z_of_r(self.z)[0] * self.cosmo_fid.rs_drag() / (self.cosmo_fid.z_of_r(self.z)[0] * alpha_rs * cosmo.rs_drag())
+
+        
 
         ## Compute power spectrum multipoles
         P0_predictions, P2_predictions, P4_predictions = self.pk_model(alpha_perp, alpha_par, norm=norm)
