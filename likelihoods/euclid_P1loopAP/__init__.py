@@ -35,7 +35,10 @@ class euclid_P1loopAP(Likelihood_prior):
             (3*self.ksize, 3*self.ksize, self.zsize), 'float64')
         self.logdetcov = np.zeros(self.zsize, 'float64')
         for z_i in range(self.zsize):
-            self.cov[:,:,z_i] = np.loadtxt(os.path.join(self.data_directory, self.covmat_file[z_i]))
+            cov = np.loadtxt(os.path.join(self.data_directory, self.covmat_file[z_i]))
+            if self.use_rs_broadband_marg:
+                cov += self.rs_broadband_prior**2*np.loadtxt(os.path.join(self.data_directory, self.marg_matrices_file[z_i]))
+            self.cov[:,:,z_i] = cov
             self.logdetcov[z_i] = np.linalg.slogdet(self.cov[:,:,z_i])[1]
 
         # Read fiducial parameters
