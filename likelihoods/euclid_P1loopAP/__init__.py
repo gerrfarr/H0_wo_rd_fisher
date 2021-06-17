@@ -37,7 +37,7 @@ class euclid_P1loopAP(Likelihood_prior):
         for z_i in range(self.zsize):
             cov = np.loadtxt(os.path.join(self.data_directory, self.covmat_file[z_i]))
             if self.use_rs_broadband_marg:
-                cov += np.loadtxt(os.path.join(self.data_directory, self.marg_matrices_file[z_i]))
+                cov += self.rs_broadband_prior**2*np.loadtxt(os.path.join(self.data_directory, self.marg_matrices_file[z_i]))
             self.cov[:,:,z_i] = cov
             self.logdetcov[z_i] = np.linalg.slogdet(self.cov[:,:,z_i])[1]
 
