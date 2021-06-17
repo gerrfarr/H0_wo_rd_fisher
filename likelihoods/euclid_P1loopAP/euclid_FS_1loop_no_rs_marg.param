@@ -35,7 +35,7 @@ data.over_sampling=[1,1]
 
 # defined as (A_s / A_{s, fid})^{1/2}
 data.parameters['norm']         = [     1,    0.9,  1.1,     0.03,     1,'nuisance']
-data.parameters['alpha_rs']     = [     1,    0.8,  1.2,     0.05,     1,'nuisance']
+data.parameters['alpha_rs']     = [     1,    0.8,  1.2,     0.0,     1,'nuisance']
 
 # NB: assuming single massive neutrino here
 data.parameters['m_ncdm']      = [ 0.06,   0., 0.3,  0, 1, 'cosmo']
@@ -114,10 +114,10 @@ data.cosmo_arguments['z_max_pk'] = '10.'
 
 euclid_P1loopAP.prior_inflation = True
 
-euclid_P1loopAP.use_rs_broadband_marg = True
+euclid_P1loopAP.use_rs_broadband_marg = False
 euclid_P1loopAP.rs_broadband_prior = 0.5
-euclid_P1loopAP.use_alpha_rs_prior = True
-euclid_P1loopAP.alpha_rs_prior = 0.5
+euclid_P1loopAP.use_alpha_rs_prior = False
+euclid_P1loopAP.alpha_rs_prior = 0.1
 
 #------ Mcmc parameters ----
 
