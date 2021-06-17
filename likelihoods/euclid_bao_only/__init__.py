@@ -35,9 +35,11 @@ class euclid_bao_only(Likelihood):
 
     use_nuisance = ['norm'] + ['b0_{}'.format(z_i + 1) for z_i in range(len(z))] + ['b2_{}'.format(z_i + 1) for z_i in range(len(z))] + ['b4_{}'.format(z_i + 1) for z_i in range(len(z))]"""
 
-    def __init__(self, path,data,command_line):
+    def __init__(self, path,data,command_line, alpha_prior=None):
 
         Likelihood.__init__(self, path, data, command_line)
+        if alpha_prior is not None:
+            self.alpha_prior=alpha_prior
 
         self.z = np.asarray(self.z)
         self.n_bin = np.shape(self.z)[0]
@@ -266,8 +268,9 @@ class euclid_bao_only(Likelihood):
         """
         chi2 = 0.0
 
-        alpha_par = self.cosmo_fid.z_of_r(self.z)[1] * self.cosmo_fid.rs_drag() / (cosmo.z_of_r(self.z)[1] * cosmo.rs_drag())
-        alpha_perp = cosmo.z_of_r(self.z)[0] * self.cosmo_fid.rs_drag() / (self.cosmo_fid.z_of_r(self.z)[0] * cosmo.rs_drag())
+        alpha_rs = data.mcmc_parameters['alpha_rs']['current'] * data.mcmc_parameters['alpha_rs']['scale']
+        alpha_par = self.cosmo_fid.z_of_r(self.z)[1] * self.cosmo_fid.rs_drag() / (cosmo.z_of_r(self.z)[1] * alpha_rs*cosmo.rs_drag())
+        alpha_perp = cosmo.z_of_r(self.z)[0] * self.cosmo_fid.rs_drag() / (self.cosmo_fid.z_of_r(self.z)[0] * alpha_rs*cosmo.rs_drag())
 
         norm = data.mcmc_parameters['norm']['current']*data.mcmc_parameters['norm']['scale']
 
