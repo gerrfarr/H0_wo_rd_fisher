@@ -21,5 +21,5 @@ euclid_bao_only.Delta_k = 0.1
 
 euclid_bao_only.use_nuisance=['norm', 'alpha_rs']+['b0_{}'.format(z_i+1) for z_i in range(len(self.z))]+['b2_{}'.format(z_i+1) for z_i in range(len(self.z))]+['b4_{}'.format(z_i+1) for z_i in range(len(self.z))]
 
-euclid_P1loopAP.use_alpha_rs_prior = True
-euclid_P1loopAP.alpha_rs_prior = 0.2
+euclid_bao_only.use_alpha_rs_prior = True
+euclid_bao_only.alpha_rs_prior = 0.5
