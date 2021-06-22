@@ -16,10 +16,10 @@ euclid_bao_only.use_quadrupole=True
 euclid_bao_only.use_hexadecapole=True
 
 euclid_bao_only.inflate_error=False
-euclid_bao_only.alpha_prior=0.0
-euclid_bao_only.rs_marg_matrices = ["EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z1.dat","EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z2.dat","EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z3.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z4.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z5.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z6.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z7.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z8.dat"]
 
 euclid_bao_only.Delta_k = 0.1
 
 euclid_bao_only.use_nuisance=['norm', 'alpha_rs']+['b0_{}'.format(z_i+1) for z_i in range(len(self.z))]+['b2_{}'.format(z_i+1) for z_i in range(len(self.z))]+['b4_{}'.format(z_i+1) for z_i in range(len(self.z))]
 
+euclid_P1loopAP.use_alpha_rs_prior = True
+euclid_P1loopAP.alpha_rs_prior = 0.2
