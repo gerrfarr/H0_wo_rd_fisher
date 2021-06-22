@@ -28,8 +28,6 @@ class euclid_bao_only(Likelihood):
     use_hexadecapole = True
 
     inflate_error = False
-    alpha_prior = 0.0
-    rs_marg_matrices = ["EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z1.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z2.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z3.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z4.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z5.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z6.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z7.dat", "EUCLID_marg_matrices/BAO_rs_marg/rs_marg_z8.dat"]
 
     Delta_k = 0.1
 
@@ -171,31 +169,7 @@ class euclid_bao_only(Likelihood):
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
-            if self.alpha_prior > 0.0:
-                rs_marg_matrix = np.loadtxt(os.path.join(self.data_directory, self.rs_marg_matrices[index_z]))
-                if self.use_quadrupole and self.use_hexadecapole:
-                    if len(rs_marg_matrix) == len(self.k_vals) * 3:
-                        pass
-                    else:
-                        raise Exception('Need correct size covariance for monopole+quadrupole+hexadecapole analysis')
-                elif self.use_quadrupole:
-                    if len(rs_marg_matrix) == len(self.k_vals) * 2:
-                        pass
-                    elif len(rs_marg_matrix) == len(self.k_vals) * 3:
-                        rs_marg_matrix = rs_marg_matrix[:2 * len(self.k_vals), :2 * len(self.k_vals)]
-                    else:
-                        raise Exception('Need correct size covariance for monopole+quadrupole analysis')
-                else:
-                    if len(rs_marg_matrix) == len(self.k_vals):
-                        pass
-                    elif len(rs_marg_matrix) == len(self.k_vals) * 2 or len(rs_marg_matrix) == len(self.k_vals) * 3:
-                        rs_marg_matrix = rs_marg_matrix[:len(self.k_vals), :len(self.k_vals)]
-                    else:
-                        raise Exception('Need correct size covariance for monopole-only analysis')
-
-                self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + rs_marg_matrix * self.alpha_prior**2 + self.all_cov[index_z])
-            else:
-                self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
+            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
 
     def interpolate_theory_spectrum(self, files):
         # load theory power spectra
@@ -299,6 +273,9 @@ class euclid_bao_only(Likelihood):
             # NB: should use cholesky decomposition and triangular factorization when we need to invert arrays later
             mb = 0  # minimum bin
             chi2 += float(np.matmul(resid_vec[mb:].T, np.matmul(self.full_invcov[index_z, mb:, mb:], resid_vec[mb:])))
+
+        if self.use_alpha_rs_prior:
+            chi2 += (alpha_rs - 1.0)**2. / self.alpha_rs_prior**2.
 
         lkl = -0.5 * chi2
         return lkl
