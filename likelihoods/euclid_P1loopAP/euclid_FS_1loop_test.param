@@ -18,7 +18,7 @@ data.experiments=['euclid_P1loopAP']
 # the three Planck likelihoods used, only Planck_highl requires nuisance
 # parameters, therefore over_sampling has a length of two (cosmology, plus one
 # set of nuisance).
-data.over_sampling=[1,1]
+data.over_sampling=[1]
 
 #------ Parameter list -------
 
