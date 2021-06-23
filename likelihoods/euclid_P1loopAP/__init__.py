@@ -176,7 +176,7 @@ class euclid_P1loopAP(Likelihood_prior):
 
             # Residual
             x = np.hstack([theory0-self.Pk0[:,z_i],theory2-self.Pk2[:,z_i],theory4-self.Pk4[:,z_i]])
-            print(x)
+            np.savetxt("./theory_pk_z{}".format(z_i), np.vstack([self.k, theory0,theory2,theory4]).T)
 
             ## COMPUTE DERIVATIVES W.R.T. LINEAR PARAMETERS
             dtheory4_dcss0 = np.zeros_like(self.k)
@@ -193,7 +193,7 @@ class euclid_P1loopAP(Likelihood_prior):
             dtheory2_dcss4 = np.zeros_like(self.k)
             #dtheory2_db4 = fz**2*self.k**2*((norm**2*fz**2*70. + 165.*fz*b1[z_i]*norm+99.*b1[z_i]**2)*4./693.)*(35./8.)*all_theory[13]*h
             dtheory2_dPshot = np.zeros_like(self.k)
-            dtheory2_dbGamma3 = 0.8*norm*norm**3*all_theory[9]*h**3
+            dtheory2_dbGamma3 = 0.8*norm**3*all_theory[9]*h**3
             #dtheory2_da0 = np.zeros_like(self.k)
             dtheory2_da2 = (2./3.)*(self.k/0.45)**2.
 
@@ -202,7 +202,7 @@ class euclid_P1loopAP(Likelihood_prior):
             dtheory0_dcss4 = np.zeros_like(self.k)
             #dtheory0_db4 = fz**2.*self.k**2.*(norm**2.*fz**2./9. + 2.*fz*b1[z_i]*norm/7. + b1[z_i]**2./5)*(35./8.)*all_theory[13]*h
             dtheory0_dPshot = np.ones_like(self.k)
-            dtheory0_dbGamma3 = 0.8*norm*norm**2*(b1[z_i]*all_theory[7]+norm*all_theory[8])*h**3
+            dtheory0_dbGamma3 = 0.8*norm**2*(b1[z_i]*all_theory[7]+norm*all_theory[8])*h**3
             #dtheory0_da0 = (self.k/0.45)**2.
             dtheory0_da2 = (1./3.)*(self.k/0.45)**2.
 
