@@ -80,7 +80,7 @@ class euclid_P1loopAP(Likelihood_prior):
                     + b2 * bG2 * norm**2 * all_theory[4]
                     + bG2**2 * norm**2 * all_theory[5]
                     + 2. * css0 * norm**2 * all_theory[11] / h**2
-                    + (2. * bG2 + 0.8 * bGamma3 * norm) * norm**2 * (b1 * all_theory[7] + norm * all_theory[8])) * h**3
+                    + (2. * bG2 + 0.8 * bGamma3) * norm**2 * (b1 * all_theory[7] + norm * all_theory[8])) * h**3
                    + Pshot
                    # + a0*(k/0.45)**2.
                    + a2 * (1. / 3.) * (k / 0.45)**2.
@@ -98,7 +98,7 @@ class euclid_P1loopAP(Likelihood_prior):
                     + b1 * bG2 * norm**2 * all_theory[36]
                     + bG2 * norm**3 * all_theory[37]
                     + 2. * css2 * norm**2 * all_theory[12] / h**2
-                    + (2. * bG2 + 0.8 * bGamma3 * norm) * norm**3 * all_theory[9]) * h**3
+                    + (2. * bG2 + 0.8 * bGamma3) * norm**3 * all_theory[9]) * h**3
                    + a2 * (2. / 3.) * (k / 0.45)**2.
                    # + fz**2*b4*k**2*((norm**2*fz**2*70. + 165.*fz*b1*norm+99.*b1**2)*4./693.)*(35./8.)*all_theory[13]*h
                    )
