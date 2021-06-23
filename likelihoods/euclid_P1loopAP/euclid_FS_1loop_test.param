@@ -1,0 +1,125 @@
+#------Experiments to test (separated with commas)-----
+
+data.experiments=['euclid_P1loopAP']
+
+#------ Settings for the over-sampling.
+# The first element will always be set to 1, for it is the sampling of the
+# cosmological parameters. The other numbers describe the over sampling of the
+# nuisance parameter space. This array must have the same dimension as the
+# number of blocks in your run (so, 1 for cosmological parameters, and then 1
+# for each experiment with varying nuisance parameters).
+# Note that when using Planck likelihoods, you definitely want to use [1, 4],
+# to oversample as much as possible the 14 nuisance parameters.
+# Remember to order manually the experiments from slowest to fastest (putting
+# Planck as the first set of experiments should be a safe bet, except if you
+# also have LSS experiments).
+# If you have experiments without nuisance, you do not need to specify an
+# additional entry in the over_sampling list (notice for instance that, out of
+# the three Planck likelihoods used, only Planck_highl requires nuisance
+# parameters, therefore over_sampling has a length of two (cosmology, plus one
+# set of nuisance).
+data.over_sampling=[1,1]
+
+#------ Parameter list -------
+
+# data.parameters[class name] = [mean, min, max, 1-sigma, scale, role]
+# - if min max irrelevant, put to None
+# - if fixed, put 1-sigma to 0
+# - if scale irrelevant, put to 1, otherwise to the appropriate factor
+# - role is either 'cosmo', 'nuisance' or 'derived'. You should put the derived
+# parameters at the end, and in case you are using the `-j fast` Cholesky
+# decomposition, you should order your nuisance parameters from slowest to
+# fastest.
+
+# Cosmological parameters list
+
+# defined as (A_s / A_{s, fid})^{1/2}
+data.parameters['norm']         = [     1,    0.9,  1.1,     0.0,     1,'nuisance']
+data.parameters['alpha_rs']     = [     1,    0.8,  1.2,     0.0,     1,'nuisance']
+
+# NB: assuming single massive neutrino here
+data.parameters['m_ncdm']      = [ 0.06,   0., 0.3,  0, 1, 'cosmo']
+#data.parameters['M_tot']      = [ 0.06,   0., 1.,  0, 1, 'cosmo']
+data.parameters['h']            = [0.6821,  0.6, 0.75, 0.0,1,   'cosmo']
+data.parameters['omega_cdm']    = [0.1177,   0.09, 0.15, 0.00,    1, 'cosmo']
+data.parameters['omega_b']      = [ 2.253,   1., 3.,  0.03, 0.0, 'cosmo']
+data.parameters['n_s']          = [0.9686,   0.9, 1.1, 0.0,    1, 'cosmo']
+
+# Nuisance parameter list, same call, except the name does not have to be a class name
+
+# NB: other nuisance parameters (Pshot, css0, css2, css4, a2 are analytically marginalized over within the likelihood)
+
+data.parameters['b1_1']         = [     1.14,    0.84,  1.44,     0.0,     1,'nuisance']
+data.parameters['b1_2']         = [     1.22,    0.92,  1.52,     0.0,     1,'nuisance']
+data.parameters['b1_3']         = [     1.3,    1.,  1.6,     0.0,     1,'nuisance']
+data.parameters['b1_4']         = [     1.38,    1.08,  1.68,     0.0,     1,'nuisance']
+data.parameters['b1_5']         = [     1.46,    1.16,  1.76,     0.0,     1,'nuisance']
+data.parameters['b1_6']         = [     1.54,    1.24,  1.84,     0.0,     1,'nuisance']
+data.parameters['b1_7']         = [     1.62,    1.32,  1.92,     0.0,     1,'nuisance']
+data.parameters['b1_8']         = [     1.7,    1.4,  2.,     0.0,     1,'nuisance']
+
+data.parameters['b2_1']         = [     -0.8180788354133334,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_2']         = [     -0.8411901983695238,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_3']         = [     -0.8511405942857143,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_4']         = [     -0.8483002414019047,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_5']         = [     -0.8330393579580953,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_6']         = [     -0.805728162194286,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_7']         = [     -0.7667368723504764,    -3,  3,     0.0,     1,'nuisance']
+data.parameters['b2_8']         = [     -0.7164357066666667,    -3,  3,     0.0,     1,'nuisance']
+
+data.parameters['bG2_1']         = [     -0.040000000000000036,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_2']         = [     -0.062857142857142848,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_3']         = [     -0.085714285714285729,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_4']         = [     -0.10857142857142854,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_5']         = [     -0.13142857142857142,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_6']         = [     -0.15428571428571428,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_7']         = [     -0.17714285714285716,    -2,  2,     0.0,     1,'nuisance']
+data.parameters['bG2_8']         = [     -0.2,    -2,  2,     0.0,     1,'nuisance']
+
+# Derived parameters
+data.parameters['Omega_m']    = [1, None, None, 0,     1,   'derived']
+data.parameters['A_s']             = [0, None, None, 0,  1e-9,   'derived']
+data.parameters['sigma8']          = [0, None, None, 0,     1,   'derived']
+
+# Other cosmo parameters (fixed parameters, precision parameters, etc.)
+
+data.cosmo_arguments['A_s'] = 2.216e-9
+#data.cosmo_arguments['ln10^{10}A_s'] = 3.044
+data.cosmo_arguments['tau_reio'] = 0.085
+
+#data.cosmo_arguments['N_eff'] = 3.04
+#data.cosmo_arguments['N_ur'] = 0.00641
+data.cosmo_arguments['N_ur'] = 2.0328
+data.cosmo_arguments['N_ncdm'] = 1
+#data.cosmo_arguments['deg_ncdm'] = 1
+#data.cosmo_arguments['T_ncdm'] = 0.71611
+#data.cosmo_arguments['YHe'] = 0.25
+#data.cosmo_arguments['k_pivot'] = 0.05
+data.cosmo_arguments['output'] = 'mPk'
+#data.cosmo_arguments['lensing'] = 'yes'
+#data.cosmo_arguments['l_max_scalars'] = '3000'
+data.cosmo_arguments['output format'] = 'FAST'
+data.cosmo_arguments['FFTLog mode'] = 'FAST'
+data.cosmo_arguments['P_k_max_h/Mpc'] = 100.
+#data.cosmo_arguments['T_cmb'] = ' 2.7255 '
+#data.cosmo_arguments['alpha_s'] = ' 0. '
+data.cosmo_arguments['non linear'] = ' PT '
+data.cosmo_arguments['IR resummation'] = ' Yes '
+data.cosmo_arguments['Bias tracers'] = ' Yes '
+data.cosmo_arguments['RSD'] = ' Yes '
+data.cosmo_arguments['AP'] = ' Yes '
+data.cosmo_arguments['Omfid'] = '0.3027857053007527'
+data.cosmo_arguments['z_pk'] = '0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0'
+data.cosmo_arguments['z_max_pk'] = '10.'
+
+euclid_P1loopAP.prior_inflation = True
+
+euclid_P1loopAP.use_rs_broadband_marg = True
+euclid_P1loopAP.rs_broadband_prior = 0.5
+euclid_P1loopAP.use_alpha_rs_prior = True
+euclid_P1loopAP.alpha_rs_prior = 0.5
+
+#------ Mcmc parameters ----
+
+data.N=10
+data.write_step=5
