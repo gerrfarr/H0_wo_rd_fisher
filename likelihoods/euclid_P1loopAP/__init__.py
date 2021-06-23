@@ -229,7 +229,7 @@ class euclid_P1loopAP(Likelihood_prior):
 
             ## ADD TO CHI^2
             chi2 += np.inner(x,np.inner(np.linalg.inv(marg_cov),x))
-            chi2 += np.linalg.slogdet(marg_cov)[1] - self.logdetcov[z_i]
+            #chi2 += np.linalg.slogdet(marg_cov)[1] - self.logdetcov[z_i]
 
             # Add priors on nuisance parameters
             b2sig = 1.*self.inflate_priors
