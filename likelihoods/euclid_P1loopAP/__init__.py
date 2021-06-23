@@ -176,6 +176,7 @@ class euclid_P1loopAP(Likelihood_prior):
 
             # Residual
             x = np.hstack([theory0-self.Pk0[:,z_i],theory2-self.Pk2[:,z_i],theory4-self.Pk4[:,z_i]])
+            print(x)
 
             ## COMPUTE DERIVATIVES W.R.T. LINEAR PARAMETERS
             dtheory4_dcss0 = np.zeros_like(self.k)
