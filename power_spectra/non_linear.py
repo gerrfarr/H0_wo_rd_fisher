@@ -22,7 +22,7 @@ from ..custom_exceptions import ClassComputationError, OrderOfOperationsError, P
 
 
 class BiasParams(object):
-    def __init__(self, b1=0.0, b2=0.0, bG2=0.0, bGamma3=0.0, b4=0.0, css0=0.0, css2=0.0, css4=0.0, Pshot=0.0, a0=0.0, a2=0.0):
+    def __init__(self, b1=0.0, b2=0.0, bG2=0.0, bGamma3=0.0, b4=0.0, css0=0.0, css2=0.0, css4=0.0, Pshot=0.0, a0=0.0, a2=0.0, alpha_rs=1.0):
         self.b1 = b1
         self.b2 = b2
         self.bG2 = bG2
@@ -34,19 +34,20 @@ class BiasParams(object):
         self.Pshot = Pshot
         self.a0 = a0
         self.a2 = a2
+        self.alpha_rs = 1.0
 
     def clone(self):
-        return BiasParams(b1=self.b1, b2=self.b2, bG2=self.bG2, bGamma3=self.bGamma3, b4=self.b4, css0=self.css0, css2=self.css2, css4=self.css4, Pshot=self.Pshot, a0=self.a0, a2=self.a2)
+        return BiasParams(b1=self.b1, b2=self.b2, bG2=self.bG2, bGamma3=self.bGamma3, b4=self.b4, css0=self.css0, css2=self.css2, css4=self.css4, Pshot=self.Pshot, a0=self.a0, a2=self.a2, alpha_rs=self.alpha_rs)
 
     def __repr__(self):
-        return f"b1={self.b1}, b2={self.b2}, bG2={self.bG2}, bGamma3={self.bGamma3}, b4={self.b4}, css0={self.css0}, css2={self.css2}, css4={self.css4}, Pshot={self.Pshot}, a0={self.a0}, a2={self.a2}"
+        return f"b1={self.b1}, b2={self.b2}, bG2={self.bG2}, bGamma3={self.bGamma3}, b4={self.b4}, css0={self.css0}, css2={self.css2}, css4={self.css4}, Pshot={self.Pshot}, a0={self.a0}, a2={self.a2}, alpha_rs={self.alpha_rs}"
 
     def get_tuple(self):
         return self.b1, self.b2, self.bG2, self.bGamma3, self.b4, self.css0, self.css2, self.css4, self.Pshot, self.a0, self.a2
 
 class ParameterPackage(object):
-    cosmo_param_names = ['h', 'T0_cmb', 'n_s', 'A_s', 'sound_horizon_scaling', 'peak_amp_scaling', 'N_eff', 'norm', 'omega_b', 'omega_cdm']
-    bias_param_names = ['b1', 'b2', 'bG2', 'css0', 'css2', 'css4', 'b4', 'Pshot', 'bGamma3', 'a0', 'a2']
+    cosmo_param_names = ['h', 'T0_cmb', 'n_s', 'A_s', 'sound_horizon_scaling', 'peak_amp_scaling', 'suppression_scaling', 'N_eff', 'norm', 'omega_b', 'omega_cdm']
+    bias_param_names = ['b1', 'b2', 'bG2', 'css0', 'css2', 'css4', 'b4', 'Pshot', 'bGamma3', 'a0', 'a2', 'alpha_rs']
     def __init__(self, cosmo, bias_params):
         """
         Packages all parameters for the cosmology and BiasParams object.
@@ -113,12 +114,11 @@ class ParameterPackage(object):
 
 not_class_pt_params = ['fEDE', 'log10z_c', 'thetai_scf', 'n_scf', 'CC_scf']
 class NonLinearPower(object):
-    def __init__(self, cosmo, redshift, Omfid=None, renormalize=True, no_wiggle=False):
+    def __init__(self, cosmo, redshift, Omfid=None, renormalize=True):
         """
 
         Parameters
         ----------
-        no_wiggle : bool
         renormalize : bool
         Omfid : float
         cosmo : Cosmology
@@ -154,7 +154,6 @@ class NonLinearPower(object):
                                    'FFTLog mode': 'FAST',
                                    'Omfid': Omfid,
                                    'A_s': 2.0989e-9 if renormalize else self.__cosmo.A_s,
-                                   'no-wiggle': 'YES' if no_wiggle else 'NO',
                                    'P_k_max_h/Mpc': '100.',
                                    }
         self.__class.set(class_non_linear_params)
@@ -179,7 +178,7 @@ class NonLinearPower(object):
             print("Non-linear power spectra already available.")
 
 
-    def get_non_linear(self, ell, kbins, bias_params):
+    def get_non_linear(self, ell, kbins, bias_params, no_wiggle=False, alpha_rs=1.0):
         """
 
         Parameters
@@ -194,7 +193,6 @@ class NonLinearPower(object):
         array_like
             Biased non-linear power spectra (Monopole and Quandrupole depending on value of `ell`)
         """
-
         #the b bias parameters are actually b_i*norm when the normalization is absorbed into the class-computation
         if not self.__renormalize:
             # avoid changing the bias parameters which are passed in in case they are reused
@@ -203,68 +201,69 @@ class NonLinearPower(object):
             bias_params.b1 = bias_params.b1 / self.__cosmo.norm
             bias_params.b2 = bias_params.b2 / self.__cosmo.norm
             bias_params.bG2 = bias_params.bG2 / self.__cosmo.norm
-            bias_params.bGamma3 = bias_params.bGamma3 / self.__cosmo.norm
 
         if not self.__computed:
             raise OrderOfOperationsError("Non-linear power spectra can not be obtained. They have not been computed yet.")
+
+        if alpha_rs==1.0 and bias_params.alpha_rs!=1.0:
+            alpha_rs=bias_params.alpha_rs
+
+        fz = self.__class.scale_independent_growth_factor_f(self.__redshift)
+        pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins), no_wiggle=no_wiggle, alpha_rs=alpha_rs)
+
+        if ell == 4:
+
+            return ((self.__norm**2 * pk_mult[20]
+                        + self.__norm**4 * pk_mult[27]
+                        + bias_params.b1 * self.__norm**3 * pk_mult[28]
+                        + bias_params.b1**2 * self.__norm**2 * pk_mult[29]
+                        + bias_params.b2 * self.__norm**3 * pk_mult[38]
+                        + bias_params.bG2 * self.__norm**3 * pk_mult[39]
+                        + 2. * bias_params.css4 * self.__norm**2 * pk_mult[13] / self.__cosmo.h**2) * self.__cosmo.h**3
+                    + fz**2*bias_params.b4*kbins**2*(self.__norm**2*fz**2*48./143. + 48.*fz*bias_params.b1*self.__norm/77.+8.*bias_params.b1**2/35.)*(35./8.)*pk_mult[13]*self.__cosmo.h
+                    )
+        elif ell == 2:
+
+            return (self.__norm ** 2. * pk_mult[18]
+                    + self.__norm ** 4. * (pk_mult[24])
+                    + self.__norm ** 1. * bias_params.b1 * pk_mult[19]
+                    + self.__norm ** 3. * bias_params.b1 * pk_mult[25]
+                    + bias_params.b1 ** 2. * self.__norm ** 2. * pk_mult[26]
+                    + bias_params.b1 * bias_params.b2 * self.__norm ** 2. * pk_mult[34]
+                    + bias_params.b2 * self.__norm ** 3. * pk_mult[35]
+                    + bias_params.b1 * bias_params.bG2 * self.__norm ** 2. * pk_mult[36]
+                    + bias_params.bG2 * self.__norm ** 3. * pk_mult[37]
+                    + 2. * (bias_params.css2 + 0. * bias_params.b4 * kbins ** 2. * self.__cosmo.h ** 2.) * self.__norm ** 2. * pk_mult[12] / self.__cosmo.h ** 2.
+                    + (2. * bias_params.bG2 + 0.8 * bias_params.bGamma3 * self.__norm) * self.__norm ** 3. * pk_mult[9]) * self.__cosmo.h ** 3.\
+                   + fz ** 2. * bias_params.b4 * kbins ** 2. * ((self.__norm ** 2. * fz ** 2. * 70. + 165. * fz * bias_params.b1 * self.__norm + 99. * bias_params.b1 ** 2.) * 4. / 693.) * (35. / 8.) * pk_mult[13] * self.__cosmo.h \
+                   + bias_params.a2 * (2. / 3.) * (kbins / 0.45)**2.
+
+        elif ell == 0:
+
+            return (self.__norm ** 2. * pk_mult[15]
+                    + self.__norm ** 4. * pk_mult[21]
+                    + self.__norm ** 1. * bias_params.b1 * pk_mult[16]
+                    + self.__norm ** 3. * bias_params.b1 * pk_mult[22]
+                    + self.__norm ** 0. * bias_params.b1 ** 2. * pk_mult[17]
+                    + self.__norm ** 2. * bias_params.b1 ** 2. * pk_mult[23]
+                    + 0.25 * self.__norm ** 2. * bias_params.b2 ** 2. * pk_mult[1]
+                    + bias_params.b1 * bias_params.b2 * self.__norm ** 2. * pk_mult[30]
+                    + bias_params.b2 * self.__norm ** 3. * pk_mult[31]
+                    + bias_params.b1 * bias_params.bG2 * self.__norm ** 2. * pk_mult[32]
+                    + bias_params.bG2 * self.__norm ** 3. * pk_mult[33]
+                    + bias_params.b2 * bias_params.bG2 * self.__norm ** 2. * pk_mult[4]
+                    + bias_params.bG2 ** 2. * self.__norm ** 2. * pk_mult[5]
+                    + 2. * bias_params.css0 * self.__norm ** 2. * pk_mult[11] / self.__cosmo.h ** 2.
+                    + (2. * bias_params.bG2 + 0.8 * bias_params.bGamma3 * self.__norm) * self.__norm ** 2. * (bias_params.b1 * pk_mult[7] + self.__norm * pk_mult[8])) * self.__cosmo.h ** 3. \
+                    + bias_params.Pshot \
+                    + bias_params.a0*(kbins/0.45)**2. \
+                    + bias_params.a2 * (1. / 3.) * (kbins / 0.45)**2. \
+                    + fz ** 2. * bias_params.b4 * kbins ** 2. * (self.__norm ** 2. * fz ** 2. / 9. + 2. * fz * bias_params.b1 * self.__norm / 7. + bias_params.b1 ** 2. / 5) * (35. / 8.) * pk_mult[13] * self.__cosmo.h
+
         else:
-            if ell == 4:
-                fz = self.__class.scale_independent_growth_factor_f(self.__redshift)
-                pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins))
-                return ((self.__norm**2 * pk_mult[20]
-                            + self.__norm**4 * pk_mult[27]
-                            + bias_params.b1 * self.__norm**3 * pk_mult[28]
-                            + bias_params.b1**2 * self.__norm**2 * pk_mult[29]
-                            + bias_params.b2 * self.__norm**3 * pk_mult[38]
-                            + bias_params.bG2 * self.__norm**3 * pk_mult[39]
-                            + 2. * bias_params.css4 * self.__norm**2 * pk_mult[13] / self.__cosmo.h**2) * self.__cosmo.h**3
-                        + fz**2*bias_params.b4*kbins**2*(self.__norm**2*fz**2*48./143. + 48.*fz*bias_params.b1*self.__norm/77.+8.*bias_params.b1**2/35.)*(35./8.)*pk_mult[13]*self.__cosmo.h
-                        )
-            elif ell == 2:
-                fz = self.__class.scale_independent_growth_factor_f(self.__redshift)
-                pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins))
+            raise ParameterValueError("The parameter ell has taken the unsupported value {}.".format(ell))
 
-                return (self.__norm ** 2. * pk_mult[18]
-                        + self.__norm ** 4. * (pk_mult[24])
-                        + self.__norm ** 1. * bias_params.b1 * pk_mult[19]
-                        + self.__norm ** 3. * bias_params.b1 * pk_mult[25]
-                        + bias_params.b1 ** 2. * self.__norm ** 2. * pk_mult[26]
-                        + bias_params.b1 * bias_params.b2 * self.__norm ** 2. * pk_mult[34]
-                        + bias_params.b2 * self.__norm ** 3. * pk_mult[35]
-                        + bias_params.b1 * bias_params.bG2 * self.__norm ** 2. * pk_mult[36]
-                        + bias_params.bG2 * self.__norm ** 3. * pk_mult[37]
-                        + 2. * (bias_params.css2 + 0. * bias_params.b4 * kbins ** 2. * self.__cosmo.h ** 2.) * self.__norm ** 2. * pk_mult[12] / self.__cosmo.h ** 2.
-                        + (2. * bias_params.bG2 + 0.8 * bias_params.bGamma3) * self.__norm ** 3. * pk_mult[9]) * self.__cosmo.h ** 3.\
-                       + fz ** 2. * bias_params.b4 * kbins ** 2. * ((self.__norm ** 2. * fz ** 2. * 70. + 165. * fz * bias_params.b1 * self.__norm + 99. * bias_params.b1 ** 2.) * 4. / 693.) * (35. / 8.) * pk_mult[13] * self.__cosmo.h \
-                       + bias_params.a2 * (2. / 3.) * (kbins / 0.45)**2.
-
-            elif ell == 0:
-                fz = self.__class.scale_independent_growth_factor_f(self.__redshift)
-                pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins))
-                return (self.__norm ** 2. * pk_mult[15]
-                        + self.__norm ** 4. * pk_mult[21]
-                        + self.__norm ** 1. * bias_params.b1 * pk_mult[16]
-                        + self.__norm ** 3. * bias_params.b1 * pk_mult[22]
-                        + self.__norm ** 0. * bias_params.b1 ** 2. * pk_mult[17]
-                        + self.__norm ** 2. * bias_params.b1 ** 2. * pk_mult[23]
-                        + 0.25 * self.__norm ** 2. * bias_params.b2 ** 2. * pk_mult[1]
-                        + bias_params.b1 * bias_params.b2 * self.__norm ** 2. * pk_mult[30]
-                        + bias_params.b2 * self.__norm ** 3. * pk_mult[31]
-                        + bias_params.b1 * bias_params.bG2 * self.__norm ** 2. * pk_mult[32]
-                        + bias_params.bG2 * self.__norm ** 3. * pk_mult[33]
-                        + bias_params.b2 * bias_params.bG2 * self.__norm ** 2. * pk_mult[4]
-                        + bias_params.bG2 ** 2. * self.__norm ** 2. * pk_mult[5]
-                        + 2. * bias_params.css0 * self.__norm ** 2. * pk_mult[11] / self.__cosmo.h ** 2.
-                        + (2. * bias_params.bG2 + 0.8 * bias_params.bGamma3) * self.__norm ** 2. * (bias_params.b1 * pk_mult[7] + self.__norm * pk_mult[8])) * self.__cosmo.h ** 3. \
-                        + bias_params.Pshot \
-                        + bias_params.a0*(kbins/0.45)**2. \
-                        + bias_params.a2 * (1. / 3.) * (kbins / 0.45)**2. \
-                        + fz ** 2. * bias_params.b4 * kbins ** 2. * (self.__norm ** 2. * fz ** 2. / 9. + 2. * fz * bias_params.b1 * self.__norm / 7. + bias_params.b1 ** 2. / 5) * (35. / 8.) * pk_mult[13] * self.__cosmo.h
-
-            else:
-                raise ParameterValueError("The parameter ell has taken the unsupported value {}.".format(ell))
-
-    def get_gaussian_covariance(self, kbins, bias_params, V_bin, Deltak=0.1, kNL=0.45, neff=3.3):
+    def get_gaussian_covariance(self, kbins, bias_params, V_bin, Deltak=0.1, kNL=0.45, neff=3.3, no_wiggle=False):
         if np.all(np.fabs(np.diff(np.log(kbins))-np.diff(np.log(kbins))[0])<1e-10):
             log_spaced=True
             deltak = np.log(kbins)[1]-np.log(kbins)[0]
@@ -274,7 +273,7 @@ class NonLinearPower(object):
             deltak = kbins[1] - kbins[0]
 
         k_size=len(kbins)
-        pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins))
+        pk_mult = self.__class.get_pk_mult(kbins * self.__cosmo.h, self.__redshift, len(kbins), no_wiggle=no_wiggle)
 
         P0 = self.get_non_linear(0, kbins, bias_params)
         P2 = self.get_non_linear(2, kbins, bias_params)
@@ -338,14 +337,14 @@ class NonLinearPower(object):
 
         return covmat
 
-    def get_all_non_linear(self, kbins, bias_params):
-        return self.get_non_linear(0, kbins, bias_params),self.get_non_linear(2, kbins, bias_params),self.get_non_linear(4, kbins, bias_params)
+    def get_all_non_linear(self, kbins, bias_params, no_wiggle=False, alpha_rs=1.0):
+        return self.get_non_linear(0, kbins, bias_params, no_wiggle, alpha_rs),self.get_non_linear(2, kbins, bias_params, no_wiggle, alpha_rs),self.get_non_linear(4, kbins, bias_params, no_wiggle, alpha_rs)
 
 
 class NonLinearPowerReplace(NonLinearPower):
-    def __init__(self, cosmo, linPower, redshift, Omfid=None, renormalize=True, k_vals_h_invMpc=None, no_wiggle=False):
+    def __init__(self, cosmo, linPower, redshift, Omfid=None, renormalize=True, k_vals_h_invMpc=None):
 
-        super().__init__(cosmo, redshift, Omfid=Omfid, renormalize=renormalize, no_wiggle=no_wiggle)
+        super().__init__(cosmo, redshift, Omfid=Omfid, renormalize=renormalize)
         self.__linPower = linPower
 
         if k_vals_h_invMpc is None:
@@ -356,9 +355,11 @@ class NonLinearPowerReplace(NonLinearPower):
 
         pk_lin_vals = linPower(self.__k_vals, redshift)
 
-        self.__temporary_power_spectrum_file = tempfile.NamedTemporaryFile()
+        self.__temporary_power_spectrum_file = tempfile.NamedTemporaryFile(delete=False)
 
         np.savetxt(self.get_power_spectrum_path(), np.vstack([self.__k_vals * cosmo.h, pk_lin_vals / cosmo.h**3 / self._NonLinearPower__norm**2.0]).T, delimiter='\t')
+
+        self.__temporary_power_spectrum_file.close()
 
         class_non_linear_params = {'Input Pk': self.get_power_spectrum_path()}
         self._NonLinearPower__class.set(class_non_linear_params)
@@ -375,25 +376,16 @@ class NonLinearPowerReplace(NonLinearPower):
                     self.compute(waited=True)
             else:
                 super().compute()
-                self.__temporary_power_spectrum_file.close()
         except ClassComputationError as ex:
-            self.__temporary_power_spectrum_file.close()
+            #self.__temporary_power_spectrum_file.close()
             raise ClassComputationError("Non-linear power spectra computation failed.")
 
 
     def get_power_spectrum_path(self):
-        if not self.__temporary_power_spectrum_file.closed:
-            return self.__temporary_power_spectrum_file.name
-        else:
-            warnings.warn("The power spectrum file has been closed and removed.", TemporaryFileClosedWarning)
-            return None
+        return self.__temporary_power_spectrum_file.name
 
     def get_temp_file(self):
-        if not self.__temporary_power_spectrum_file.closed:
-            return self.__temporary_power_spectrum_file
-        else:
-            warnings.warn("The power spectrum file has been closed and removed.", TemporaryFileClosedWarning)
-            return None
+        return self.__temporary_power_spectrum_file
 
     def replace_background_evolution(self, H, DA, D, f):
         replacement_params = {'replace background': 'YES',
@@ -402,3 +394,6 @@ class NonLinearPowerReplace(NonLinearPower):
                               'Dz_replace': D,
                               'fz_replace': f}
         self._NonLinearPower__class.set(replacement_params)
+
+    def __del__(self):
+        os.remove(self.__temporary_power_spectrum_file.name)
