@@ -41,7 +41,7 @@ class EisensteinHu():
         self.r_drag = 31.5 * self.Obh2 * self.theta_cmb ** -4 * (1000. / (1+self.z_drag))
         self.r_eq   = 31.5 * self.Obh2 * self.theta_cmb ** -4 * (1000. / self.z_eq)
 
-        self.sound_horizon = cosmo.sound_horizon_scaling * (2. / (3. * self.k_eq) * numpy.sqrt(6. / self.r_eq) * numpy.log((numpy.sqrt(1 + self.r_drag) + numpy.sqrt(self.r_drag + self.r_eq)) / (1 + numpy.sqrt(self.r_eq))))
+        self.sound_horizon = cosmo.suppression_scaling * cosmo.sound_horizon_scaling * (2. / (3. * self.k_eq) * numpy.sqrt(6. / self.r_eq) * numpy.log((numpy.sqrt(1 + self.r_drag) + numpy.sqrt(self.r_drag + self.r_eq)) / (1 + numpy.sqrt(self.r_eq))))
         self.k_silk = 1.6 * self.Obh2 ** 0.52 * self.Omh2 ** 0.73 * (1 + (10.4*self.Omh2) ** -0.95)
 
         # alpha_c
@@ -109,11 +109,11 @@ class EisensteinHu():
         T_b_T0 = f(T_c_ln_nobeta, T_c_C_noalpha)
         T_b_1 = T_b_T0 / (1 + (ks/5.2)**2 )
         T_b_2 = self.alpha_b / (1 + (self.beta_b/ks)**3 ) * numpy.exp(-(k/self.k_silk) ** 1.4)
-        T_b = self.cosmo.peak_amp_scaling*numpy.sinc(ks_tilde/numpy.pi) * (T_b_1 + T_b_2)
+        T_b = self.cosmo.peak_amp_scaling*numpy.sin(ks_tilde / self.cosmo.suppression_scaling)/ks_tilde * (T_b_1 + T_b_2)
 
         dT_b_1=-T_b_1**2/T_b_T0*2*(ks/5.2)**2
         dT_b_2=T_b_2*( 1+3*(self.beta_b/ks)**3/(1+(self.beta_b/ks)**3) )
-        dT_b = (ks_tilde*numpy.cos(ks_tilde) - numpy.sin(ks_tilde))/ks_tilde**2*dks_tilde*(T_b_1+T_b_2) + numpy.sinc(ks_tilde/numpy.pi)*(dT_b_1 + dT_b_2)
+        dT_b = (ks_tilde*numpy.cos(ks_tilde) - numpy.sin(ks_tilde))/ks_tilde**2*dks_tilde*(T_b_1+T_b_2) + self.cosmo.peak_amp_scaling*numpy.sin(ks_tilde)/ks_tilde*(dT_b_1 + dT_b_2)
 
         T = numpy.ones(valid.shape)
         T[valid] = self.f_baryon*T_b + (1-self.f_baryon)*T_c;
@@ -150,7 +150,7 @@ class NoWiggleEisensteinHu(object):
         # wavenumber of equality
         self.k_eq = 0.0746 * self.Omh2 * self.theta_cmb ** (-2) # units of 1/Mpc
 
-        self.sound_horizon = cosmo.sound_horizon_scaling * cosmo.h * 44.5 * numpy.log(9.83 / self.Omh2) / \
+        self.sound_horizon = cosmo.suppression_scaling * cosmo.sound_horizon_scaling * cosmo.h * 44.5 * numpy.log(9.83 / self.Omh2) / \
                              numpy.sqrt(1 + 10 * self.Obh2** 0.75) # in Mpc/h
         self.alpha_gamma = 1 - 0.328 * numpy.log(431*self.Omh2) * self.f_baryon + \
                             0.38* numpy.log(22.3*self.Omh2) * self.f_baryon ** 2
