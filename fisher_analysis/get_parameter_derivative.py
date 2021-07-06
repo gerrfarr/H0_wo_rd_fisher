@@ -15,7 +15,7 @@ class ParamDerivatives(object):
     Class to compute derivatives with respect to a given parameter
 
     """
-    def __init__(self, fiducial_params, param_name, param_vals, eval_function, *function_args, stencil=None, verbose=False, **function_kwargs):
+    def __init__(self, fiducial_params, param_name, param_vals, eval_function, *function_args, stencil=None, verbose=False, order_deriv=1, **function_kwargs):
         """
 
         Parameters
@@ -47,7 +47,7 @@ class ParamDerivatives(object):
         if stencil is None:
             stencil = np.array((self.__param_vals - self.__fiducial_value) / self.__step_size, dtype=np.int)
 
-        self.__coefficients = DifferentiationHelper.get_finite_difference_coefficients(stencil, 1)
+        self.__coefficients = DifferentiationHelper.get_finite_difference_coefficients(stencil, order_deriv)
         self.__has_to_recompute = param_name in ParameterPackage.cosmo_param_names
 
         self.__cosmologies = None
