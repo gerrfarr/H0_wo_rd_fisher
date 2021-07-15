@@ -45,6 +45,7 @@ class euclid_P1loopAP(Likelihood_prior):
         # These are similar to the Chudaykin+Ivanov'19 paper (but not identical)
         # NB: we have weak Gaussian priors on nuisance parameters for marg. reasons
         self.z = np.asarray(self.z)
+        self.norm_fid = 1.0275169724566378
         self.b1fid = 0.9+0.4*self.z
         self.bG2fid = -2./7.*(self.b1fid-1.)
         self.b2fid = -0.704172-0.207993*self.z+0.183023*self.z**2.-0.00771288*self.z**3. + 4./3.*self.bG2fid
@@ -235,7 +236,7 @@ class euclid_P1loopAP(Likelihood_prior):
             b2sig = 1.*self.inflate_priors
             bG2sig = 1.*self.inflate_priors
 
-            chi2 += (b2[z_i]/norm - self.b2fid[z_i])**2./b2sig**2. + (bG2[z_i]/norm - self.bG2fid[z_i])**2./bG2sig**2.
+            chi2 += (b2[z_i]/norm*self.norm_fid - self.b2fid[z_i])**2./b2sig**2. + (bG2[z_i]/norm*self.norm_fid - self.bG2fid[z_i])**2./bG2sig**2.
 
         if self.use_alpha_rs_prior:
             chi2 += (alpha_rs - 1.0)**2. / self.alpha_rs_prior**2.
