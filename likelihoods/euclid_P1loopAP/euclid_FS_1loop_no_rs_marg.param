@@ -34,7 +34,7 @@ data.over_sampling=[1,1]
 # Cosmological parameters list
 
 # defined as (A_s / A_{s, fid})^{1/2}
-data.parameters['norm']         = [     1,    0.9,  1.1,     0.03,     1,'nuisance']
+data.parameters['norm']         = [     1.0275169724566378,    0.9,  1.1,     0.03,     1,'nuisance']
 data.parameters['alpha_rs']     = [     1,    0.8,  1.2,     0.0,     1,'nuisance']
 
 # NB: assuming single massive neutrino here
@@ -83,7 +83,7 @@ data.parameters['sigma8']          = [0, None, None, 0,     1,   'derived']
 
 # Other cosmo parameters (fixed parameters, precision parameters, etc.)
 
-data.cosmo_arguments['A_s'] = 2.216e-9
+data.cosmo_arguments['A_s'] = 2.0989e-9
 #data.cosmo_arguments['ln10^{10}A_s'] = 3.044
 data.cosmo_arguments['tau_reio'] = 0.085
 
