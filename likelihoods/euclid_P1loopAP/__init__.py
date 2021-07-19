@@ -45,18 +45,18 @@ class euclid_P1loopAP(Likelihood_prior):
         # These are similar to the Chudaykin+Ivanov'19 paper (but not identical)
         # NB: we have weak Gaussian priors on nuisance parameters for marg. reasons
         self.z = np.asarray(self.z)
-        self.norm_fid = 1.0275169724566378
+        #self.norm_fid = 1.0275169724566378
         self.b1fid = 0.9+0.4*self.z
         self.bG2fid = -2./7.*(self.b1fid-1.)
         self.b2fid = -0.704172-0.207993*self.z+0.183023*self.z**2.-0.00771288*self.z**3. + 4./3.*self.bG2fid
         self.bGamma3fid = 23./42.*(self.b1fid-1.)
 
-        self.css0fid = np.array([1.02840888, 0.85047489, 0.71099831, 0.60092898, 0.51324095, 0.44263946, 0.38517755, 0.33791505])
-        self.css2fid = np.array([28.14592718, 23.27615492, 19.4589011, 16.44647729, 14.0465943, 12.11434314, 10.5417015,  9.24820126])
-        self.css4fid = np.array([-1.29904279, -1.07428407, -0.89810313, -0.75906818, -0.64830435, -0.55912353, -0.48654007, -0.42684006])
+        self.css0fid = np.array([1.028409076422109, 0.8504750555126785, 0.710998446651058, 0.6009290940289844, 0.5132410445958041, 0.442639546298396, 0.38517762925674237, 0.33791511114016776])
+        self.css2fid = np.array([28.145932617868244, 23.276159414031202, 19.45890485571317, 16.44648046816168, 14.04659700999043, 12.114345477640311, 10.54170353755295, 9.248203041730907])
+        self.css4fid = np.array([-1.2990430439016112, -1.0742842806475938, -0.8981033010329155, -0.7590683292997699, -0.6483044773841736, -0.5591236374295528, -0.4865401632716746, -0.4268401403875803])
         # NB: we don't include b4 term here
         self.b4fid = np.zeros(self.zsize,'float64')
-        self.Pshotfid = np.array([266.72033974,   493.34609653,   871.80085246,  1483.89009589,2643.35019949,  4942.81643221,  8865.13815301, 15323.47246985])
+        self.Pshotfid = np.array([266.72015936025565, 493.3458318663388, 871.8004574255534, 1483.8895054255129, 2643.3492511153418, 4942.814802630568, 8865.13543105212, 15323.468044314039])
 
         if hasattr(self,'prior_inflation'):
             if self.prior_inflation:
@@ -236,7 +236,7 @@ class euclid_P1loopAP(Likelihood_prior):
             b2sig = 1.*self.inflate_priors
             bG2sig = 1.*self.inflate_priors
 
-            chi2 += (b2[z_i]/norm*self.norm_fid - self.b2fid[z_i])**2./b2sig**2. + (bG2[z_i]/norm*self.norm_fid - self.bG2fid[z_i])**2./bG2sig**2.
+            chi2 += (b2[z_i]/norm - self.b2fid[z_i])**2./b2sig**2. + (bG2[z_i]/norm - self.bG2fid[z_i])**2./bG2sig**2.
 
         if self.use_alpha_rs_prior:
             chi2 += (alpha_rs - 1.0)**2. / self.alpha_rs_prior**2.
