@@ -19,7 +19,7 @@ data.experiments=['euclid_bao_only_new', 'bbn_priors']
 # parameters, therefore over_sampling has a length of two (cosmology, plus one
 # set of nuisance).
 #
-data.over_sampling=[1, 1]
+data.over_sampling=[1]
 
 #------ Parameter list -------
 
