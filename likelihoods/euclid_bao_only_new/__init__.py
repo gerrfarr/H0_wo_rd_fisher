@@ -269,7 +269,7 @@ class euclid_bao_only_new(Likelihood):
         chi2=0
 
         for z_i,z in enumerate(self.z):
-            bias_params = (self.b1fid[z_i], self.b2fid[z_i], self.bG2fid[z_i], self.bGamma3fid[z_i], self.css0fid[z_i], self.css2[z_i], self.css4fid[z_i], 0.0, self.Pshotfid[z_i])
+            bias_params = (self.b1fid[z_i], self.b2fid[z_i], self.bG2fid[z_i], self.bGamma3fid[z_i], self.css0fid[z_i], self.css2fid[z_i], self.css4fid[z_i], 0.0, self.Pshotfid[z_i])
 
             P0,P2,P4 = self.pk_model(z, h, alpha_perp[z_i], alpha_par[z_i], norm, alpha_rs, bias_params)
 
