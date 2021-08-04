@@ -25,7 +25,20 @@ class euclid_bao_only_new(Likelihood):
                             'tau_reio': 0.085,
                             'm_ncdm': 0.06,
                             'N_ncdm': 1,
-                            'N_ur': 2.0328})
+                            'N_ur': 2.0328,
+                            'tau_reion': 0.085,
+                            'output': 'mPk',
+                            'output format': 'FAST',
+                            'FFTLog mode': 'FAST',
+                            'P_k_max_h/Mpc': 100,
+                            'non linear': 'PT',
+                            'IR resummation': 'YES',
+                            'Bias tracers': 'YES',
+                            'RSD': 'YES',
+                            'AP': 'YES',
+                            'Omfid': 0.3027857053007527,
+                            'z_pk': '0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0',
+                            'z_max_pk': 10.})
         self.cosmo_fid.compute()
 
         self.b1fid = 0.9 + 0.4 * self.z
