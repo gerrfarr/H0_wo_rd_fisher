@@ -26,7 +26,7 @@ class euclid_bao_only_new(Likelihood):
                             'm_ncdm': 0.06,
                             'N_ncdm': 1,
                             'N_ur': 2.0328,
-                            'tau_reion': 0.085,
+                            'tau_reio': 0.085,
                             'output': 'mPk',
                             'output format': 'FAST',
                             'FFTLog mode': 'FAST',
