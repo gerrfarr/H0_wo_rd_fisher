@@ -1,0 +1,24 @@
+# Unreconstructed EUCLID multipole data
+euclid_bao_only_new.data_directory = "/home/r/rbond/gfarren/H0_kEq/data/"
+
+# Set redshifts
+euclid_bao_only_new.z = [0.6, 0.8, 1. , 1.2, 1.4, 1.6, 1.8, 2.]
+
+# other input parameters
+euclid_bao_only_new.cov_file = ["EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z1.dat","EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z2.dat","EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z3.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z4.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z5.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z6.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z7.dat", "EUCLID_mock_spectra/LCDM_covmats/euclid_mock_covmat_z8.dat"]
+
+euclid_bao_only_new.file = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+euclid_bao_only_new.file_fid = ["EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z1.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z2.dat","EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z3.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z4.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z5.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z6.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z7.dat", "EUCLID_mock_spectra/LCDM_spectra/euclid_mock_lcdm_z8.dat"]
+
+
+euclid_bao_only_new.use_quadrupole=True
+euclid_bao_only_new.use_hexadecapole=True
+
+euclid_bao_only_new.inflate_error=False
+
+euclid_bao_only_new.Delta_k = 0.1
+
+euclid_bao_only_new.use_nuisance=['norm', 'alpha_rs']
+
+euclid_bao_only_new.use_alpha_rs_prior = True
+euclid_bao_only_new.alpha_rs_prior = 0.5
