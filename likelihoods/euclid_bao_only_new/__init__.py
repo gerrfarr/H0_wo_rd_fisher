@@ -225,7 +225,7 @@ class euclid_bao_only_new(Likelihood):
         k1 = self.kGrid / alpha_perp * np.sqrt(1. + np.power(self.muGrid, 2.) * (np.power(F, -2.) - 1.))
         mu1 = self.muGrid / (F * np.sqrt(1. + np.power(self.muGrid, 2.) * (np.power(F, -2.) - 1.)))
 
-        all_theory = self.cosmo_fid.get_pk_mult(k1.flatten() * h, z, len(self.k), alpha_rs=alpha_rs)
+        all_theory = self.cosmo_fid.get_pk_mult(k1.flatten() * h, z, len(k1.flatten()), alpha_rs=alpha_rs)
 
         fz = self.cosmo_fid.scale_independent_growth_factor_f(z)
         P0,P2,P4 = self.evaluate_pt_model(all_theory, k1.flatten(), h, fz, norm, *bias_params)
