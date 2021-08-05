@@ -268,7 +268,7 @@ class euclid_bao_only_new(Likelihood):
 
         norm = data.mcmc_parameters['norm']['current'] * data.mcmc_parameters['norm']['scale']
         alpha_rs = data.mcmc_parameters['alpha_rs']['current'] * data.mcmc_parameters['alpha_rs']['scale']
-        h=cosmo.h()
+        h=self.cosmo_fid.h()
 
         b1 = [data.mcmc_parameters['b1_%d' % i]['current'] * data.mcmc_parameters['b1_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
         b2 = [data.mcmc_parameters['b2_%d' % i]['current'] * data.mcmc_parameters['b2_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
