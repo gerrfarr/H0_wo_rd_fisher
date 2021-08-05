@@ -172,7 +172,7 @@ class euclid_bao_only_new(Likelihood):
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
-            self.full_cov[index_z] = cov_theoretical_error + self.all_cov[index_z]
+            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
 
     @staticmethod
     def evaluate_pt_model(all_theory, k, h, fz, norm, b1, b2, bG2, bGamma3, css0, css2, css4, a2, Pshot):
@@ -299,7 +299,7 @@ class euclid_bao_only_new(Likelihood):
                 stacked_data = self.Pk0_data[z_i]
             resid_vec = stacked_data - stacked_model
 
-            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_cov[z_i], resid_vec)))
+            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov[z_i], resid_vec)))
 
             chi2 += (b2[z_i] / norm - self.b2fid[z_i])**2. / b2sig**2. + (bG2[z_i] / norm - self.bG2fid[z_i])**2. / bG2sig**2.
 
