@@ -26,7 +26,6 @@ class euclid_bao_only_new(Likelihood):
                             'm_ncdm': 0.06,
                             'N_ncdm': 1,
                             'N_ur': 2.0328,
-                            'tau_reio': 0.085,
                             'output': 'mPk',
                             'output format': 'FAST',
                             'FFTLog mode': 'FAST',
@@ -52,6 +51,14 @@ class euclid_bao_only_new(Likelihood):
         # NB: we don't include b4 term here
         self.b4fid = np.zeros(self.n_bin, 'float64')
         self.Pshotfid = np.array([266.72015936025565, 493.3458318663388, 871.8004574255534, 1483.8895054255129, 2643.3492511153418, 4942.814802630568, 8865.13543105212, 15323.468044314039])
+
+        if hasattr(self, 'prior_inflation'):
+            if self.prior_inflation:
+                self.inflate_priors = 10.
+            else:
+                self.inflate_priors = 1.
+        else:
+            self.inflate_priors = 1.
 
         ## Define parameters for Gaussian quadrature
         n_gauss = 30  # number of Gaussian quadrature points
@@ -165,7 +172,7 @@ class euclid_bao_only_new(Likelihood):
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
-            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
+            self.full_cov[index_z] = cov_theoretical_error + self.all_cov[index_z]
 
     @staticmethod
     def evaluate_pt_model(all_theory, k, h, fz, norm, b1, b2, bG2, bGamma3, css0, css2, css4, a2, Pshot):
@@ -263,13 +270,20 @@ class euclid_bao_only_new(Likelihood):
         alpha_rs = data.mcmc_parameters['alpha_rs']['current'] * data.mcmc_parameters['alpha_rs']['scale']
         h=cosmo.h()
 
+        b1 = [data.mcmc_parameters['b1_%d' % i]['current'] * data.mcmc_parameters['b1_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        b2 = [data.mcmc_parameters['b2_%d' % i]['current'] * data.mcmc_parameters['b2_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        bG2 = [data.mcmc_parameters['bG2_%d' % i]['current'] * data.mcmc_parameters['bG2_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+
+        b2sig = 1. * self.inflate_priors
+        bG2sig = 1. * self.inflate_priors
+
         alpha_par = self.cosmo_fid.z_of_r(self.z)[1] * self.cosmo_fid.rs_drag() / (cosmo.z_of_r(self.z)[1] * cosmo.rs_drag())
         alpha_perp = cosmo.z_of_r(self.z)[0] * self.cosmo_fid.rs_drag() / (self.cosmo_fid.z_of_r(self.z)[0] * cosmo.rs_drag())
 
         chi2=0
 
         for z_i,z in enumerate(self.z):
-            bias_params = (self.b1fid[z_i], self.b2fid[z_i], self.bG2fid[z_i], self.bGamma3fid[z_i], self.css0fid[z_i], self.css2fid[z_i], self.css4fid[z_i], 0.0, self.Pshotfid[z_i])
+            bias_params = (b1[z_i], b2[z_i], bG2[z_i], self.bGamma3fid[z_i], self.css0fid[z_i], self.css2fid[z_i], self.css4fid[z_i], 0.0, self.Pshotfid[z_i])
 
             P0,P2,P4 = self.pk_model(z, h, alpha_perp[z_i], alpha_par[z_i], norm, alpha_rs, bias_params)
 
@@ -285,9 +299,9 @@ class euclid_bao_only_new(Likelihood):
                 stacked_data = self.Pk0_data[z_i]
             resid_vec = stacked_data - stacked_model
 
-            # NB: should use cholesky decomposition and triangular factorization when we need to invert arrays later
-            mb = 0  # minimum bin
-            chi2 += float(np.matmul(resid_vec[mb:].T, np.matmul(self.full_invcov[z_i, mb:, mb:], resid_vec[mb:])))
+            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_cov[z_i], resid_vec)))
+
+            chi2 += (b2[z_i] / norm - self.b2fid[z_i])**2. / b2sig**2. + (bG2[z_i] / norm - self.bG2fid[z_i])**2. / bG2sig**2.
 
         if self.use_alpha_rs_prior:
             chi2 += (alpha_rs - 1.0)**2. / self.alpha_rs_prior**2.
