@@ -145,5 +145,5 @@ data.cosmo_arguments['N_ncdm'] = 1
 data.N=10
 data.write_step=5
 
-euclid_bao_only.file = ["EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z1.dat","EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z2.dat","EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z3.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z4.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z5.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z6.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z7.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z8.dat"]
+euclid_bao_only_new.file = ["EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z1.dat","EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z2.dat","EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z3.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z4.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z5.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z6.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z7.dat", "EUCLID_mock_spectra/EDE_spectra/euclid_mock_ede_fit_bias_params_z8.dat"]
 
