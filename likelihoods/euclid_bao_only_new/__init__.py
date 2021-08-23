@@ -301,7 +301,7 @@ class euclid_bao_only_new(Likelihood):
 
             chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov[z_i], resid_vec)))
 
-            chi2 += (b2[z_i] / norm - self.b2fid[z_i])**2. / b2sig**2. + (bG2[z_i] / norm - self.bG2fid[z_i])**2. / bG2sig**2.
+            chi2 += (b2[z_i] - self.b2fid[z_i])**2. / b2sig**2. + (bG2[z_i] - self.bG2fid[z_i])**2. / bG2sig**2.
 
         if self.use_alpha_rs_prior:
             chi2 += (alpha_rs - 1.0)**2. / self.alpha_rs_prior**2.
