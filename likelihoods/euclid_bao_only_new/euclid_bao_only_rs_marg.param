@@ -32,7 +32,7 @@ data.over_sampling=[1, 1]
 # decomposition, you should order your nuisance parameters from slowest to
 # fastest.
 
-data.parameters['norm']         = [     1,    0.9,  1.1,     0.03,     1,'nuisance']
+data.parameters['norm']         = [     1,    0.9,  1.1,     0.0,     1,'nuisance']
 data.parameters['alpha_rs']     = [     1,    0.8,  1.2,     0.1,     1,'nuisance']
 
 # Cosmological parameters list
