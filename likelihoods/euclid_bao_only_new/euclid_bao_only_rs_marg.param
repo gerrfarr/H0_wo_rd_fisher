@@ -82,6 +82,33 @@ data.parameters['bG2_6']         = [     -0.15428571428571428,    -2,  2,     0.
 data.parameters['bG2_7']         = [     -0.17714285714285716,    -2,  2,     0.03,     1,'nuisance']
 data.parameters['bG2_8']         = [     -0.2,    -2,  2,     0.03,     1, 'nuisance']
 
+data.parameters['scale0_1']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_2']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_3']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_4']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_5']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_6']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_7']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale0_8']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+
+data.parameters['scale2_1']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_2']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_3']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_4']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_5']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_6']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_7']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale2_8']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+
+data.parameters['scale4_1']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_2']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_3']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_4']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_5']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_6']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_7']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+data.parameters['scale4_8']         = [     1.00,    0.5,  1.5,     0.1,     1,'nuisance']
+
 # Derived parameters
 
 #data.parameters['z_reio']          = [1, None, None, 0,     1,   'derived']

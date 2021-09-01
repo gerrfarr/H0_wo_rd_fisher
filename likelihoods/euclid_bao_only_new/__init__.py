@@ -52,6 +52,12 @@ class euclid_bao_only_new(Likelihood):
         self.b4fid = np.zeros(self.n_bin, 'float64')
         self.Pshotfid = np.array([266.72015936025565, 493.3458318663388, 871.8004574255534, 1483.8895054255129, 2643.3492511153418, 4942.814802630568, 8865.13543105212, 15323.468044314039])
 
+        self.poly_priors = np.array([[self.Pshotfid/0.1**3, self.Pshotfid/0.1**3, self.Pshotfid/0.1**3],
+                                     [self.Pshotfid/0.1**2, self.Pshotfid/0.1**2, self.Pshotfid/0.1**2],
+                                     [self.Pshotfid*0.1, self.Pshotfid*0.1, self.Pshotfid*0.1],
+                                     [self.Pshotfid, self.Pshotfid, self.Pshotfid],
+                                     [self.Pshotfid/0.1, self.Pshotfid/0.1, self.Pshotfid/0.1]])
+
         if hasattr(self, 'prior_inflation'):
             if self.prior_inflation:
                 self.inflate_priors = 10.
@@ -120,7 +126,7 @@ class euclid_bao_only_new(Likelihood):
         self.leg4 = legendre(4,self.muGrid)
 
 
-        self.full_invcov = np.zeros(self.all_cov.shape)
+        self.full_cov = np.zeros(self.all_cov.shape)
         ## Compute theoretical error envelope and combine with usual covariance
         for index_z in range(self.n_bin):
             data = np.loadtxt(os.path.join(self.data_directory, self.file_fid[index_z]))
@@ -172,7 +178,31 @@ class euclid_bao_only_new(Likelihood):
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
-            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z])
+            zeros = np.zeros_like(self.k)
+
+            broadband_marg_matrix = np.zeros_like(cov_theoretical_error)
+
+            for n in range(-3, 2):
+                dtheory_da = self.k_vals**n
+                if self.use_quadrupole and self.use_hexadecapole:
+                    dtheory0_da = np.hstack([dtheory_da, zeros, zeros])
+                    dtheory2_da = np.hstack([zeros, dtheory_da, zeros])
+                    dtheory4_da = np.hstack([zeros, zeros, dtheory_da])
+
+                    broadband_marg_matrix += self.poly_priors[n + 3, 0]**2 + np.outer(dtheory0_da, dtheory0_da) \
+                                             + self.poly_priors[n + 3, 1]**2 + np.outer(dtheory2_da, dtheory2_da) \
+                                             + self.poly_priors[n + 3, 2]**2 + np.outer(dtheory4_da, dtheory4_da)
+                elif self.use_quadrupole:
+                    dtheory0_da = np.hstack([dtheory_da, zeros])
+                    dtheory2_da = np.hstack([zeros, dtheory_da])
+
+                    broadband_marg_matrix += self.poly_priors[n + 3, 0]**2 + np.outer(dtheory0_da, dtheory0_da) \
+                                             + self.poly_priors[n + 3, 1]**2 + np.outer(dtheory2_da, dtheory2_da)
+
+                else:
+                    broadband_marg_matrix += self.poly_priors[n + 3, 0]**2 + np.outer(dtheory_da, dtheory_da)
+
+            self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z] + broadband_marg_matrix)
 
     @staticmethod
     def evaluate_pt_model(all_theory, k, h, fz, norm, b1, b2, bG2, bGamma3, css0, css2, css4, a2, Pshot):
@@ -274,6 +304,22 @@ class euclid_bao_only_new(Likelihood):
         b2 = [data.mcmc_parameters['b2_%d' % i]['current'] * data.mcmc_parameters['b2_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
         bG2 = [data.mcmc_parameters['bG2_%d' % i]['current'] * data.mcmc_parameters['bG2_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
 
+        """a0m1 = [data.mcmc_parameters['a0m1_%d' % i]['current'] * data.mcmc_parameters['a0m1_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        a00 = [data.mcmc_parameters['a00_%d' % i]['current'] * data.mcmc_parameters['a00_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        a01 = [data.mcmc_parameters['a01_%d' % i]['current'] * data.mcmc_parameters['a01_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+
+        a1m1 = [data.mcmc_parameters['a1m1_%d' % i]['current'] * data.mcmc_parameters['a1m1_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        a10 = [data.mcmc_parameters['a10_%d' % i]['current'] * data.mcmc_parameters['a10_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        a11 = [data.mcmc_parameters['a11_%d' % i]['current'] * data.mcmc_parameters['a11_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+
+        a2m1 = [data.mcmc_parameters['a2m1_%d' % i]['current'] * data.mcmc_parameters['a2m1_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        a20 = [data.mcmc_parameters['a20_%d' % i]['current'] * data.mcmc_parameters['a20_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        a21 = [data.mcmc_parameters['a21_%d' % i]['current'] * data.mcmc_parameters['a21_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]"""
+
+        scale_0 = [data.mcmc_parameters['scale0_%d' % i]['current'] * data.mcmc_parameters['scale0_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        scale_2 = [data.mcmc_parameters['scale2_%d' % i]['current'] * data.mcmc_parameters['scale2_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+        scale_4 = [data.mcmc_parameters['scale4_%d' % i]['current'] * data.mcmc_parameters['scale4_%d' % i]['scale'] for i in range(1, self.n_bin + 1)]
+
         b2sig = 1. * self.inflate_priors
         bG2sig = 1. * self.inflate_priors
 
@@ -289,17 +335,17 @@ class euclid_bao_only_new(Likelihood):
 
             # Create vector of residual pk
             if self.use_quadrupole and self.use_hexadecapole:
-                stacked_model = np.concatenate([P0, P2, P4])
-                stacked_data = np.concatenate([self.Pk0_data[z_i], self.Pk2_data[z_i], self.Pk4_data[z_i]])
+                stacked_model = np.concatenate([P4])
+                stacked_data = np.concatenate([scale_0[z_i] * self.Pk0_data[z_i], scale_2[z_i] * self.Pk2_data[z_i], scale_4[z_i] * self.Pk4_data[z_i]])
             elif self.use_quadrupole:
                 stacked_model = np.concatenate([P0, P2])
-                stacked_data = np.concatenate([self.Pk0_data[z_i], self.Pk2_data[z_i]])
+                stacked_data = np.concatenate([scale_0[z_i] * self.Pk0_data[z_i], scale_2[z_i] * self.Pk2_data[z_i]])
             else:
                 stacked_model = P0
-                stacked_data = self.Pk0_data[z_i]
+                stacked_data = scale_0[z_i] * self.Pk0_data[z_i]
             resid_vec = stacked_data - stacked_model
 
-            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov[z_i], resid_vec)))
+            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov, resid_vec)))
 
             chi2 += (b2[z_i] - self.b2fid[z_i])**2. / b2sig**2. + (bG2[z_i] - self.bG2fid[z_i])**2. / bG2sig**2.
 

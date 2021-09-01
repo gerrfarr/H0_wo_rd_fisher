@@ -20,6 +20,9 @@ euclid_bao_only_new.include_a2 = True
 euclid_bao_only_new.Delta_k = 0.1
 
 euclid_bao_only_new.use_nuisance=['norm','b1_1','b1_2','b1_3','b1_4','b1_5','b1_6','b1_7','b1_8','b2_1','b2_2','b2_3','b2_4','b2_5','b2_6','b2_7','b2_8','bG2_1','bG2_2','bG2_3','bG2_4','bG2_5','bG2_6','bG2_7','bG2_8', 'alpha_rs']
+euclid_bao_only_new.use_nuisance+=['scale0_%d' % i for i in range(1,9)]
+euclid_bao_only_new.use_nuisance+=['scale2_%d' % i for i in range(1,9)]
+euclid_bao_only_new.use_nuisance+=['scale4_%d' % i for i in range(1,9)]
 
 euclid_bao_only_new.use_alpha_rs_prior = True
 euclid_bao_only_new.alpha_rs_prior = 0.5
