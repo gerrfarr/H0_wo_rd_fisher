@@ -189,6 +189,8 @@ class euclid_bao_only_new(Likelihood):
                     dtheory2_da = np.hstack([zeros, dtheory_da, zeros])
                     dtheory4_da = np.hstack([zeros, zeros, dtheory_da])
 
+                    print(dtheory_da.shape, dtheory0_da.shape, dtheory2_da.shape, dtheory4_da.shape, broadband_marg_matrix.shape, (self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da)).shape)
+
                     broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da) \
                                              + self.poly_priors[n + 3, 1, index_z]**2 + np.outer(dtheory2_da, dtheory2_da) \
                                              + self.poly_priors[n + 3, 2, index_z]**2 + np.outer(dtheory4_da, dtheory4_da)
