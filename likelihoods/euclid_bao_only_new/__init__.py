@@ -336,14 +336,15 @@ class euclid_bao_only_new(Likelihood):
 
             # Create vector of residual pk
             if self.use_quadrupole and self.use_hexadecapole:
-                stacked_model = np.concatenate([P4])
-                stacked_data = np.concatenate([scale_0[z_i] * self.Pk0_data[z_i], scale_2[z_i] * self.Pk2_data[z_i], scale_4[z_i] * self.Pk4_data[z_i]])
+                stacked_model = np.concatenate([scale_0[z_i] * P0, scale_2[z_i] * P2, scale_4[z_i] * P4])
+                stacked_data = np.concatenate([self.Pk0_data[z_i], self.Pk2_data[z_i], self.Pk4_data[z_i]])
             elif self.use_quadrupole:
-                stacked_model = np.concatenate([P0, P2])
-                stacked_data = np.concatenate([scale_0[z_i] * self.Pk0_data[z_i], scale_2[z_i] * self.Pk2_data[z_i]])
+                stacked_model = np.concatenate([scale_0[z_i] * P0, scale_2[z_i] * P2])
+                stacked_data = np.concatenate([self.Pk0_data[z_i], self.Pk2_data[z_i]])
             else:
-                stacked_model = P0
-                stacked_data = scale_0[z_i] * self.Pk0_data[z_i]
+                stacked_model = scale_0[z_i] * P0
+                stacked_data = self.Pk0_data[z_i]
+
             resid_vec = stacked_data - stacked_model
 
             chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov[z_i], resid_vec)))
