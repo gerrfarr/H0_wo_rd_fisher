@@ -75,8 +75,6 @@ class euclid_bao_only_new(Likelihood):
         self.Pk2_data = None
         self.Pk4_data = None
 
-        zeros = np.zeros_like(self.k_vals, dtype='float')
-
         for index_z in range(self.n_bin):
             data = np.loadtxt(os.path.join(self.data_directory, self.file[index_z]))
             # define input arrays
@@ -98,6 +96,9 @@ class euclid_bao_only_new(Likelihood):
 
         # Load in covariance matrices
         self.all_cov = np.zeros((self.n_bin, (1 + self.use_quadrupole + self.use_hexadecapole)*len(self.k_vals), (1 + self.use_quadrupole + self.use_hexadecapole)*len(self.k_vals)))
+
+        zeros = np.zeros_like(self.k_vals, dtype='float')
+
         for index_z in range(self.n_bin):
             this_cov = np.loadtxt(os.path.join(self.data_directory, self.cov_file[index_z]))
 
