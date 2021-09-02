@@ -56,7 +56,7 @@ class euclid_bao_only_new(Likelihood):
                                      [self.Pshotfid/0.1**2, self.Pshotfid/0.1**2, self.Pshotfid/0.1**2],
                                      [self.Pshotfid*0.1, self.Pshotfid*0.1, self.Pshotfid*0.1],
                                      [self.Pshotfid, self.Pshotfid, self.Pshotfid],
-                                     [self.Pshotfid/0.1, self.Pshotfid/0.1, self.Pshotfid/0.1]])
+                                     [self.Pshotfid/0.1, self.Pshotfid/0.1, self.Pshotfid/0.1]], dtype='float')
 
         if hasattr(self, 'prior_inflation'):
             if self.prior_inflation:
@@ -75,7 +75,7 @@ class euclid_bao_only_new(Likelihood):
         self.Pk2_data = None
         self.Pk4_data = None
 
-        zeros = np.zeros_like(self.k_vals)
+        zeros = np.zeros_like(self.k_vals, dtype='float')
 
         for index_z in range(self.n_bin):
             data = np.loadtxt(os.path.join(self.data_directory, self.file[index_z]))
@@ -180,7 +180,7 @@ class euclid_bao_only_new(Likelihood):
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
 
-            broadband_marg_matrix = np.zeros_like(cov_theoretical_error)
+            broadband_marg_matrix = np.zeros_like(cov_theoretical_error, dtype='float')
 
             for n in range(-3, 2):
                 dtheory_da = self.k_vals**n
