@@ -129,7 +129,7 @@ class euclid_bao_only_new(Likelihood):
         self.leg4 = legendre(4,self.muGrid)
 
 
-        self.full_cov = np.zeros(self.all_cov.shape)
+        self.full_invcov = np.zeros(self.all_cov.shape)
         ## Compute theoretical error envelope and combine with usual covariance
         for index_z in range(self.n_bin):
             data = np.loadtxt(os.path.join(self.data_directory, self.file_fid[index_z]))
@@ -189,8 +189,6 @@ class euclid_bao_only_new(Likelihood):
                     dtheory0_da = np.hstack([dtheory_da, zeros, zeros])
                     dtheory2_da = np.hstack([zeros, dtheory_da, zeros])
                     dtheory4_da = np.hstack([zeros, zeros, dtheory_da])
-
-                    print(dtheory_da.shape, dtheory0_da.shape, dtheory2_da.shape, dtheory4_da.shape, broadband_marg_matrix.shape, (self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da)).shape)
 
                     broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da) \
                                              + self.poly_priors[n + 3, 1, index_z]**2 + np.outer(dtheory2_da, dtheory2_da) \
@@ -348,7 +346,7 @@ class euclid_bao_only_new(Likelihood):
                 stacked_data = scale_0[z_i] * self.Pk0_data[z_i]
             resid_vec = stacked_data - stacked_model
 
-            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov, resid_vec)))
+            chi2 += float(np.matmul(resid_vec.T, np.matmul(self.full_invcov[z_i], resid_vec)))
 
             chi2 += (b2[z_i] - self.b2fid[z_i])**2. / b2sig**2. + (bG2[z_i] - self.bG2fid[z_i])**2. / bG2sig**2.
 
