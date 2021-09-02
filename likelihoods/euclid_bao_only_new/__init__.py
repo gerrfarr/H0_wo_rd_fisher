@@ -75,6 +75,8 @@ class euclid_bao_only_new(Likelihood):
         self.Pk2_data = None
         self.Pk4_data = None
 
+        zeros = np.zeros_like(self.k_vals)
+
         for index_z in range(self.n_bin):
             data = np.loadtxt(os.path.join(self.data_directory, self.file[index_z]))
             # define input arrays
@@ -177,8 +179,6 @@ class euclid_bao_only_new(Likelihood):
 
             E_mat = np.diag(stacked_E)
             cov_theoretical_error = np.matmul(E_mat, np.matmul(rho_matrix, E_mat))
-
-            zeros = np.zeros_like(self.k)
 
             broadband_marg_matrix = np.zeros_like(cov_theoretical_error)
 
