@@ -193,14 +193,14 @@ class NonLinearPower(object):
         array_like
             Biased non-linear power spectra (Monopole and Quandrupole depending on value of `ell`)
         """
-        #the b bias parameters are actually b_i*norm when the normalization is absorbed into the class-computation
+        """#the b bias parameters are actually b_i*norm when the normalization is absorbed into the class-computation
         if not self.__renormalize:
             # avoid changing the bias parameters which are passed in in case they are reused
             bias_params = bias_params.clone()
 
             bias_params.b1 = bias_params.b1 / self.__cosmo.norm
             bias_params.b2 = bias_params.b2 / self.__cosmo.norm
-            bias_params.bG2 = bias_params.bG2 / self.__cosmo.norm
+            bias_params.bG2 = bias_params.bG2 / self.__cosmo.norm"""
 
         if not self.__computed:
             raise OrderOfOperationsError("Non-linear power spectra can not be obtained. They have not been computed yet.")
@@ -279,15 +279,14 @@ class NonLinearPower(object):
         P2 = self.get_non_linear(2, kbins, bias_params)
         P4 = self.get_non_linear(4, kbins, bias_params)
 
-        # the b bias parameters are actually b_i*norm when the normalization is absorbed into the class-computation
+        """# the b bias parameters are actually b_i*norm when the normalization is absorbed into the class-computation
         if not self.__renormalize:
             # avoid changing the bias parameters which are passed in in case they are reused
             bias_params = bias_params.clone()
 
             bias_params.b1 = bias_params.b1 / self.__cosmo.norm
             bias_params.b2 = bias_params.b2 / self.__cosmo.norm
-            bias_params.bG2 = bias_params.bG2 / self.__cosmo.norm
-            bias_params.bGamma3 = bias_params.bGamma3 / self.__cosmo.norm
+            bias_params.bG2 = bias_params.bG2 / self.__cosmo.norm"""
 
         P0err = (self.__norm**2 * pk_mult[15] + self.__norm * bias_params.b1 * pk_mult[16] + bias_params.b1**2. * pk_mult[17]) * self.__cosmo.h**3. + bias_params.Pshot
         P2err = (self.__norm**2 * pk_mult[18] + self.__norm * bias_params.b1 * pk_mult[19]) * self.__cosmo.h**3.

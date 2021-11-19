@@ -3,7 +3,7 @@ import os
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.special.orthogonal import p_roots
-from classy import Class
+from classy_pt import Class
 from scipy.special import eval_legendre as legendre
 
 class euclid_bao_only(Likelihood):
@@ -42,14 +42,15 @@ class euclid_bao_only(Likelihood):
 
         self.cosmo_fid=Class()
         self.cosmo_fid.set({'h':0.6821,
-                 'omega_b':0.02253,
-                 'omega_cdm':0.1177,
-                 'A_s':2.216e-9,
-                 'n_s':0.9686,
-                 'tau_reio':0.085,
-                 'm_ncdm': 0.06,
-                 'N_ncdm':1,
-                 'N_ur':2.0328})
+                            'omega_b':0.02253,
+                            'omega_cdm':0.1177,
+                            'A_s':2.216e-9,
+                            'n_s':0.9686,
+                            'tau_reio':0.085,
+                            'm_ncdm': 0.06,
+                            'N_ncdm':1,
+                            'N_ur':2.0328,
+                            })
         self.cosmo_fid.compute()
 
         ## Define parameters for Gaussian quadrature
