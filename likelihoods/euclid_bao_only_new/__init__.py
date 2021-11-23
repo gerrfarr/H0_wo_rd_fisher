@@ -183,25 +183,26 @@ class euclid_bao_only_new(Likelihood):
 
             broadband_marg_matrix = np.zeros_like(cov_theoretical_error, dtype='float')
 
-            for n in range(-3, 2):
-                dtheory_da = self.k_vals**n
-                if self.use_quadrupole and self.use_hexadecapole:
-                    dtheory0_da = np.hstack([dtheory_da, zeros, zeros])
-                    dtheory2_da = np.hstack([zeros, dtheory_da, zeros])
-                    dtheory4_da = np.hstack([zeros, zeros, dtheory_da])
+            if self.use_poly_marg:
+                for n in range(-3, 2):
+                    dtheory_da = self.k_vals**n
+                    if self.use_quadrupole and self.use_hexadecapole:
+                        dtheory0_da = np.hstack([dtheory_da, zeros, zeros])
+                        dtheory2_da = np.hstack([zeros, dtheory_da, zeros])
+                        dtheory4_da = np.hstack([zeros, zeros, dtheory_da])
 
-                    broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da) \
-                                             + self.poly_priors[n + 3, 1, index_z]**2 + np.outer(dtheory2_da, dtheory2_da) \
-                                             + self.poly_priors[n + 3, 2, index_z]**2 + np.outer(dtheory4_da, dtheory4_da)
-                elif self.use_quadrupole:
-                    dtheory0_da = np.hstack([dtheory_da, zeros])
-                    dtheory2_da = np.hstack([zeros, dtheory_da])
+                        broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da) \
+                                                 + self.poly_priors[n + 3, 1, index_z]**2 + np.outer(dtheory2_da, dtheory2_da) \
+                                                 + self.poly_priors[n + 3, 2, index_z]**2 + np.outer(dtheory4_da, dtheory4_da)
+                    elif self.use_quadrupole:
+                        dtheory0_da = np.hstack([dtheory_da, zeros])
+                        dtheory2_da = np.hstack([zeros, dtheory_da])
 
-                    broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da) \
-                                             + self.poly_priors[n + 3, 1, index_z]**2 + np.outer(dtheory2_da, dtheory2_da)
+                        broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory0_da, dtheory0_da) \
+                                                 + self.poly_priors[n + 3, 1, index_z]**2 + np.outer(dtheory2_da, dtheory2_da)
 
-                else:
-                    broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory_da, dtheory_da)
+                    else:
+                        broadband_marg_matrix += self.poly_priors[n + 3, 0, index_z]**2 + np.outer(dtheory_da, dtheory_da)
 
             self.full_invcov[index_z] = np.linalg.inv(cov_theoretical_error + self.all_cov[index_z] + broadband_marg_matrix)
 

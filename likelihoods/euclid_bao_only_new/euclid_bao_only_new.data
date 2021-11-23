@@ -23,3 +23,5 @@ euclid_bao_only_new.use_nuisance=['norm','b1_1','b1_2','b1_3','b1_4','b1_5','b1_
 
 euclid_bao_only_new.use_alpha_rs_prior = True
 euclid_bao_only_new.alpha_rs_prior = 0.5
+
+euclid_bao_only_new.use_poly_marg = False
